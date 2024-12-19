@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Insights</title>
+    <meta name="description" content="best cyber security and hacking quotes find it easily on Begins.site.">
+    <link rel="icon" type="image/png" href="title.png">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --text-color: #ecf0f1;
+            --background-color: #1a1a1a;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 85vh;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+        header {
+            background-color: var(--primary-color);
+            padding: 0.8rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        main {
+            flex: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .quote-container {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .quote-container::before {
+            content: '"';
+            position: absolute;
+            top: -200px;
+            left: 200px;
+            font-size: 150px;
+            color: rgba(255,255,255,0.1);
+            font-family: Georgia, serif;
+        }
+        .quote {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .author {
+            font-style: italic;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .new-quote-btn {
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        .new-quote-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+        .new-quote-btn:hover::before {
+            left: 100%;
+        }
+        .new-quote-btn:hover {
+            background-color: #2980b9;
+        }
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 600px) {
+            .quote {
+                font-size: 1.2rem;
+            }
+            .quote-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cybersecurity Insights</h1>
+    </header>
+    <main>
+        <div class="quote-container">
+            <p class="quote" id="quote"></p>
+            <p class="author" id="author"></p>
+            <button class="new-quote-btn" onclick="displayQuote()">New Insight</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Begins.site | All rights reserved.</p>
+    </footer>
+
+    <script>
+        const quotes = [
+            { text: "The only truly secure system is one that is powered off, cast in a block of concrete and sealed in a lead-lined room with armed guards.", author: "Gene Spafford" },
+            { text: "Security is always excessive until it's not enough.", author: "Robbie Sinclair" },
+            { text: "Passwords are like underwear: don't let people see it, change it very often, and you shouldn't share it with strangers.", author: "Chris Pirillo" },
+            { text: "If you think technology can solve your security problems, then you don't understand the problems and you don't understand the technology.", author: "Bruce Schneier" },
+            { text: "The human factor is the weakest link in the chain of security.", author: "Kevin Mitnick" },
+            { text: "Cybersecurity is a shared responsibility, and it boils down to this: in cybersecurity, the more systems we secure, the more secure we all are.", author: "Jeh Johnson" },
+            { text: "The Internet is the crime scene of the 21st century.", author: "Cyrus Vance Jr." },
+            { text: "There are two types of companies: those that have been hacked, and those who don't know they have been hacked.", author: "John Chambers" },
+            { text: "In the underworld of hacking, the rule is simple: if you can't protect it, you don't own it.", author: "Anonymous" },
+            { text: "The best way to predict the future is to create it.", author: "Alan Kay" },
+            { text: "Privacy is not an option, and it shouldn't be the price we accept for just getting on the Internet.", author: "Gary Kovacs" },
+            { text: "Ethical hacking is a key component of cyber defense.", author: "John McAfee" },
+            { text: "The goal of security is not to build a system that is absolutely secure, but to make the cost of successful attack greater than the potential gain.", author: "Unknown" },
+            { text: "Hacking is not a crime. It's a skill.", author: "Kevin Mitnick" },
+            { text: "The weakest link in the security chain is the human element.", author: "Unknown" },
+            { text: "In the world of Internet Customer Service, it's important to remember your competitor is only one mouse click away.", author: "Doug Warner" },
+            { text: "Cybersecurity is much more than a matter of IT.", author: "Stephane Nappo" },
+            { text: "The best defense against social engineering attacks is user education.", author: "Kevin Mitnick" },
+            { text: "You can't defend. You can't prevent. The only thing you can do is detect and respond.", author: "Bruce Schneier" },
+            { text: "Security is always going to be a cat and mouse game because there'll be people out there that are hunting for the zero day award, you have people that don't have configuration management, you have people that are looking for the next new thing to attack.", author: "Kevin Mitnick" },
+            { text: "The Internet is becoming the town square for the global village of tomorrow.", author: "Bill Gates" },
+            { text: "Cybersecurity is a process, not a product.", author: "Bruce Schneier" },
+            { text: "The key to good security is to make the attacker's job as difficult as possible.", author: "Unknown" },
+            { text: "In the digital world, trust is earned with transparency, accountability and security.", author: "Unknown" },
+            { text: "The best way to get management excited about a disaster plan is to burn down the building across the street.", author: "Dan Erwin" },
+            { text: "Information security's response to bitter failure, in any area of risk, is to change the process and practice.", author: "Marcus J. Ranum" },
+            { text: "It takes 20 years to build a reputation and few minutes of cyber-incident to ruin it.", author: "Stephane Nappo" },
+            { text: "Cyber attacks are like a game of whack-a-mole: once you knock one down, another one pops up.", author: "Unknown" },
+            { text: "The Internet is a powerful amplifier that can strengthen or weaken one's position dramatically.", author: "Evgeny Morozov" },
+            { text: "The difference between a script kiddie and a hacker is the difference between a locksmith and a burglar.", author: "Unknown" },
+            { text: "The most secure computer is one that's not connected to any network.", author: "Unknown" },
+            { text: "In the world of cybersecurity, if you're reacting, you're losing.", author: "Unknown" },
+            { text: "The art of war teaches us to rely not on the likelihood of the enemy's not coming, but on our own readiness to receive him.", author: "Sun Tzu" },
+            { text: "Hackers are the immune system of the Internet.", author: "Unknown" },
+            { text: "The best way to solve a problem is to prevent it from happening in the first place.", author: "Unknown" },
+            { text: "In the digital age, privacy is a luxury and security is a necessity.", author: "Unknown" },
+            { text: "The beauty of the Internet is that it's a global network, but that's also its weakness.", author: "Unknown" },
+            { text: "Cybersecurity is like a game of chess; you have to think several moves ahead to stay protected.", author: "Unknown" },
+            { text: "The Internet is like a chessboard. Every move you make leaves a trace.", author: "Unknown" },
+            { text: "In the realm of cybersecurity, complacency is the enemy of safety.", author: "Unknown" },
+            { text: "The best firewall is an educated user.", author: "Unknown" },
+            { text: "In the digital world, your data is your most valuable asset. Protect it like your life depends on it.", author: "Unknown" },
+            { text: "Cybersecurity is not just about protecting data, it's about protecting people's lives and livelihoods.", author: "Unknown" },
+            { text: "The Internet is a double-edged sword. It can be a tool for progress or a weapon for destruction.", author: "Unknown" },
+            { text: "In the world of cybersecurity, the best offense is a good defense.", author: "Unknown" },
+            { text: "The most dangerous threat to your cybersecurity is the one you don't know about.", author: "Unknown" },
+            { text: "Cybersecurity is not just an IT issue, it's a business issue.", author: "Unknown" },
+            { text: "The Internet is like the Wild West. There are outlaws and sheriffs, and you need to know which one you are.", author: "Unknown" },
+            { text: "In the digital age, ignorance is not bliss. It's a vulnerability.", author: "Unknown" },
+            { text: "The best way to catch a hacker is to think like one.", author: "Unknown" },
+            { text: "Cybersecurity is not about eliminating risk, it's about managing it.", author: "Unknown" },
+            { text: "In the world of cybersecurity, yesterday's solutions won't solve tomorrow's problems.", author: "Unknown" },
+            { text: "The Internet never forgets. Think before you click.", author: "Unknown" },
+            { text: "Cybersecurity is a journey, not a destination.", author: "Unknown" },
+            { text: "In the digital world, trust but verify.", author: "Unknown" },
+            { text: "The best cybersecurity strategy is one that evolves as fast as the threats do.", author: "Unknown" },
+            { text: "In the realm of cybersecurity, knowledge is power, but application is everything.", author: "Unknown" },
+            { text: "The Internet is a vast ocean of information. Navigate it wisely.", author: "Unknown" },
+            { text: "Cybersecurity is like a game of whack-a-mole, but the moles are getting smarter.", author: "Unknown" },
+            { text: "In the digital age, your online reputation is your reputation.", author: "Unknown" },
+            { text: "The best way to protect your digital assets is to assume they're always under attack.", author: "Unknown" },
+            { text: "Cybersecurity is not just about technology, it's about people and processes too.", author: "Unknown" },
+            { text: "In the world of cybersecurity, the only constant is change.", author: "Unknown" },
+            { text: "The Internet is a powerful tool, but like any tool, it can be dangerous if misused.", author: "Unknown" },
+            { text: "Cybersecurity is not just a technical challenge, it's a human challenge.", author: "Unknown" },
+            { text: "In the digital world, your security is only as strong as your weakest link.", author: "Unknown" },
+            { text: "The best defense against cyber threats is a well-informed and vigilant workforce.", author: "Unknown" },
+            { text: "Cybersecurity is not just about keeping the bad guys out, it's about letting the good guys in.", author: "Unknown" },
+            { text: "In the realm of cybersecurity, complacency is the enemy of safety.", author: "Unknown" },
+            { text: "The Internet is like a city. There are safe neighborhoods and dangerous ones. Know where you're going.", author: "Unknown" },
+            { text: "Cybersecurity is not just about protecting data, it's about protecting trust.", author: "Unknown" },
+            { text: "In the digital age, privacy is a right, not a privilege.", author: "Unknown" },
+            { text: "The best way to stay secure online is to always question everything.", author: "Unknown" },
+            { text: "Cybersecurity is not just about technology, it's about behavior.", author: "Unknown" },
+            { text: "In the world of cybersecurity, the best defense is a good offense.", author: "Unknown" },
+            { text: "The Internet is a reflection of our society, and that mirror is going to be reflecting what we see.", author: "Vint Cerf" },
+            { text: "Cybersecurity is like a game of chess. You need to think several moves ahead to stay protected.", author: "Unknown" },
+            { text: "In the digital world, your data is your identity. Protect it at all costs.", author: "Unknown" },
+            { text: "The best way to predict cyber threats is to create them.", author: "Unknown" },
+            { text: "Cybersecurity is not just about protecting systems, it's about protecting people.", author: "Unknown" },
+            { text: "In the realm of cybersecurity, the best offense is a good defense.", author: "Unknown" },
+            { text: "The Internet is like a weapon. In the right hands, it's a tool for progress. In the wrong hands, it's a threat.", author: "Unknown" },
+            { text: "Cybersecurity is not just about technology, it's about psychology.", author: "Unknown" },
+            { text: "In the digital age, your online footprint is your legacy.", author: "Unknown" },
+            { text: "The best way to secure your digital life is to assume it's always under threat.", author: "Unknown" },
+            { text: "Cybersecurity is not just about protecting data, it's about protecting lives.", author: "Unknown" },
+            { text: "In the world of cybersecurity, the only thing worse than no security is a false sense of security.", author: "Unknown" },
+            { text: "The Internet is like a jungle. Beautiful, but potentially dangerous. Navigate wisely.", author: "Unknown" },
+            { text: "Cybersecurity is not just about prevention, it's about resilience.", author: "Unknown" },
+            { text: "In the digital world, your security is only as strong as your habits.", author: "Unknown" },
+            { text: "The best firewall is between your ears.", author: "Unknown" },
+            { text: "Cybersecurity is not just about keeping secrets, it's about maintaining integrity.", author: "Unknown" },
+            { text: "In the realm of cybersecurity, ignorance is not bliss. It's a vulnerability.", author: "Unknown" },
+            { text: "The Internet is a powerful tool for democracy, but only if we protect it.", author: "Unknown" },
+            { text: "Cybersecurity is not just about technology, it's about culture.", author: "Unknown" },
+            { text: "In the digital age, trust is the most valuable currency.", author: "Unknown" },
+            { text: "The best way to stay secure online is to be paranoid, but not paralyzed.", author: "Unknown" },
+            { text: "Cybersecurity is not just about defending, it's about educating.", author: "Unknown" },
+            { text: "In the world of cybersecurity, the human factor is both the weakest link and the strongest asset.", author: "Unknown" },
+            { text: "The Internet is like the Wild West. There are opportunities and dangers. Be prepared for both.", author: "Unknown" },
+            { text: "Cybersecurity is not just about protecting against known threats, but anticipating unknown ones.", author: "Unknown" },
+            { text: "In the digital world, your privacy is your responsibility.", author: "Unknown" },
+            { text: "The best way to secure your future is to secure your digital present.", author: "Unknown" },
+            { text: "Cybersecurity is not just a technical issue, it's a social issue.", author: "Unknown" },
+            { text: "In the realm of cybersecurity, complacency is the first step towards compromise.", author: "Unknown" },
+            { text: "The Internet is a mirror of humanity. It reflects our best and worst traits.", author: "Unknown" },
+            { text: "Cybersecurity is not just about protecting assets, it's about preserving trust.", author: "Unknown" }
+        ];
+
+        let currentQuoteIndex = -1;
+
+        function getRandomQuote() {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * quotes.length);
+            } while (newIndex === currentQuoteIndex);
+            currentQuoteIndex = newIndex;
+            return quotes[currentQuoteIndex];
+        }
+
+        function displayQuote() {
+            const quoteObj = getRandomQuote();
+            const quoteElement = document.getElementById('quote');
+            const authorElement = document.getElementById('author');
+
+            quoteElement.style.opacity = 0;
+            authorElement.style.opacity = 0;
+
+            setTimeout(() => {
+                quoteElement.textContent = quoteObj.text;
+                authorElement.textContent = `— ${quoteObj.author}`;
+
+                quoteElement.style.opacity = 1;
+                authorElement.style.opacity = 1;
+            }, 500);
+        }
+
+        displayQuote();
+
+        // Particle animation
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        document.body.appendChild(canvas);
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.zIndex = '-1';
+
+        const particles = [];
+        const particleCount = 50;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].size <= 0.2) {
+                    particles.splice(i, 1);
+                    i--;
+                    particles.push(new Particle());
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

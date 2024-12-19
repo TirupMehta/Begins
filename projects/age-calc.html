@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator - CheckmateBegins</title>
+    <meta name="description" content="Calculate your age in years, months, weeks, and days with our age calculator. Created by CheckmateBegins.">
+    <meta name="keywords" content="Age Calculator, CheckmateBegins, Age in Years, Months, Weeks, Days">
+    <meta name="author" content="CheckmateBegins">
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background gradient with blur */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(255, 255, 255, 0.3));
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Blurred animated overlay */
+        .blur-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
+            filter: blur(15px);
+            z-index: 0;
+            animation: backgroundAnimation 10s infinite linear;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { transform: scale(1) translateX(0); }
+            50% { transform: scale(1.05) translateX(10px); }
+            100% { transform: scale(1) translateX(0); }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Header */
+        h1 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            animation: fadeIn 1s ease;
+        }
+
+        /* Subheader */
+        p {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Input styling with subtle focus effect */
+        input[type="date"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 80%;
+            font-size: 1em;
+            color: #333;
+            background-color: #f9f9fb;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.05);
+            transition: border 0.3s, background-color 0.3s;
+            animation: slideIn 1s ease;
+        }
+
+        input[type="date"]:focus {
+            border-color: #4a90e2;
+            background-color: #f1f8ff;
+            outline: none;
+        }
+
+        /* Button with hover effect */
+        button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            box-shadow: 2px 2px 8px rgba(74, 144, 226, 0.3);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #357abd;
+            transform: scale(1.05);
+        }
+
+        /* Result text with animation */
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #333;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+
+        #result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Detail results with animation */
+        .details {
+            margin-top: 15px;
+            font-size: 1em;
+            color: #666;
+            line-height: 1.6em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease-in, transform 0.4s ease-in;
+        }
+
+        .details.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 30px;
+            font-size: 0.85em;
+            color: #777;
+        }
+
+        footer a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <div class="blur-background"></div>
+    <div class="container">
+        <h1>Age Calculator</h1>
+        <p>Find out your exact age in years, months, weeks, and days!</p>
+        <input type="date" id="birthdate">
+        <button onclick="calculateAge()">Calculate Age</button>
+        <p id="result"></p>
+        <div id="details" class="details"></div>
+        <footer>
+            <p>© <a href="https://begins.site" target="_blank">CheckmateBegins</a> | <a href="https://begins.site" target="_blank">Go to Homepage</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function calculateAge() {
+            const birthdate = new Date(document.getElementById('birthdate').value);
+            const today = new Date();
+
+            // Validating date input
+            if (!birthdate || isNaN(birthdate.getTime())) {
+                document.getElementById('result').innerText = "Please select a valid date.";
+                document.getElementById('result').classList.add("show");
+                document.getElementById('details').classList.remove("show");
+                return;
+            }
+
+            // Calculating age in years, months, days, and weeks
+            let age = today.getFullYear() - birthdate.getFullYear();
+            let months = (age * 12) + today.getMonth() - birthdate.getMonth();
+            let days = Math.floor((today - birthdate) / (1000 * 60 * 60 * 24));
+            let weeks = Math.floor(days / 7);
+
+            // Adjusting for exact date in the year
+            const monthDifference = today.getMonth() - birthdate.getMonth();
+            const dayDifference = today.getDate() - birthdate.getDate();
+            if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+                age--;
+            }
+
+            // Display results
+            document.getElementById('result').innerText = `You are ${age} years old.`;
+            document.getElementById('result').classList.add("show");
+
+            // Display additional details
+            document.getElementById('details').innerHTML = `
+                <strong>Additional Details:</strong><br>
+                • Months Lived: ${months} months<br>
+                • Weeks Lived: ${weeks} weeks<br>
+                • Days Lived: ${days} days
+            `;
+            document.getElementById('details').classList.add("show");
+        }
+    </script>
+</body>
+</html>

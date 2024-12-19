@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheckmateBegins - QR Gen</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --text-color: #e0e0e0;
+            --primary-color: #00ffff;
+            --primary-hover: #00cccc;
+            --input-bg: rgba(44, 44, 44, 0.8);
+            --input-border: #3d3d3d;
+        }
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1);
+            max-width: 450px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease-out forwards;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .chess-icon {
+            font-size: 32px;
+            align-items: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: none;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--input-border);
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: #000;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+        button:hover::after {
+            top: -100%;
+            left: -100%;
+        }
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #qrcode img {
+            max-width: 100%;
+            height: auto;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        #qrcode img.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        h4 {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 400;
+            color: #b0b0b0;
+        }
+        @keyframes particle {
+            0% { transform: translate(0, 0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <center><h1><span class="chess-icon">♞</span> CheckmateBegins</h1></center>
+        <p>Generate a QR code for your website link</p>
+        <input type="url" id="urlInput" placeholder="https://example.com" aria-label="Enter website URL">
+        <div id="qrcode"></div>
+        <button onclick="generateQR()">Generate QR Code</button>
+        <h4><span class="chess-icon">-</span> Take a screenshot of the generated QR Code and you're ready to go!</h4>
+    </div>
+
+    <script>
+        function generateQR() {
+            const url = document.getElementById('urlInput').value;
+            if (!url) {
+                alert('Please enter a valid URL');
+                return;
+            }
+
+            const qr = qrcode(0, 'L');
+            qr.addData(url);
+            qr.make();
+
+            const qrCodeDiv = document.getElementById('qrcode');
+            qrCodeDiv.innerHTML = qr.createImgTag(5);
+            
+            setTimeout(() => {
+                qrCodeDiv.querySelector('img').classList.add('show');
+            }, 50);
+
+            createParticles();
+        }
+
+        function createParticles() {
+            const particlesContainer = document.body;
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                particle.style.animation = `particle ${3 + Math.random() * 2}s linear`;
+                particlesContainer.appendChild(particle);
+                setTimeout(() => {
+                    particle.remove();
+                }, 5000);
+            }
+        }
+
+        // Create particles periodically
+        setInterval(createParticles, 3000);
+    </script>
+</body>
+</html>

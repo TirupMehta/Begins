@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Browser Fingerprinting Checker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4a7ae0;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .info-item h3 {
+            margin: 0 0 10px 0;
+            color: #4a7ae0;
+            font-size: 18px;
+        }
+        .info-item p {
+            margin: 0;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        #toggleMore {
+            background-color: #4a7ae0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        #toggleMore:hover {
+            background-color: #3a67c0;
+        }
+        #moreInfo {
+            display: none;
+        }
+        #canvasFingerprint, #webglFingerprint {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #4a7ae0;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .progress-container {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            height: 20px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            background-color: #4a7ae0;
+            width: 0;
+            transition: width 0.5s ease-in-out;
+        }
+        #uniquenessScore {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a7ae0;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+        }
+        footer a {
+            color: #4a7ae0;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Browser Fingerprinting Checker</h1>
+        <div class="info-grid" id="basicInfo"></div>
+        <button id="toggleMore">Show More Details</button>
+        <div id="moreInfo">
+            <h2>Advanced Information</h2>
+            <div class="info-grid" id="advancedInfo"></div>
+            <h2>Hardware Information</h2>
+            <div class="info-grid" id="hardwareInfo"></div>
+            <h2>Browser Capabilities</h2>
+            <div class="info-grid" id="capabilitiesInfo"></div>
+            <h2>Canvas Fingerprint</h2>
+            <canvas id="canvasFingerprint"></canvas>
+            <h2>WebGL Fingerprint</h2>
+            <canvas id="webglFingerprint"></canvas>
+            <h2>Audio Fingerprint</h2>
+            <div id="audioFingerprint"></div>
+            <h2>Font Fingerprint</h2>
+            <div id="fontFingerprint"></div>
+        </div>
+        <h2>Estimated Uniqueness</h2>
+        <div class="progress-container">
+            <div class="progress-bar" id="uniquenessBar"></div>
+        </div>
+        <div id="uniquenessScore"></div>
+        <footer>
+            &copy; 2024 <a href="https://Begins.site" target="_blank">CheckmateBegins</a>. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const basicInfo = document.getElementById('basicInfo');
+            const advancedInfo = document.getElementById('advancedInfo');
+            const hardwareInfo = document.getElementById('hardwareInfo');
+            const capabilitiesInfo = document.getElementById('capabilitiesInfo');
+            const moreInfo = document.getElementById('moreInfo');
+            const toggleMore = document.getElementById('toggleMore');
+            const canvasFingerprint = document.getElementById('canvasFingerprint');
+            const webglFingerprint = document.getElementById('webglFingerprint');
+            const audioFingerprint = document.getElementById('audioFingerprint');
+            const fontFingerprint = document.getElementById('fontFingerprint');
+            const uniquenessBar = document.getElementById('uniquenessBar');
+            const uniquenessScore = document.getElementById('uniquenessScore');
+
+            const fingerprint = {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                languages: navigator.languages.join(', '),
+                platform: navigator.platform,
+                deviceMemory: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Not available',
+                hardwareConcurrency: navigator.hardwareConcurrency || 'Not available',
+                screenResolution: `${window.screen.width}x${window.screen.height}`,
+                colorDepth: `${window.screen.colorDepth}-bit`,
+                pixelRatio: window.devicePixelRatio,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                touchSupport: 'ontouchstart' in window ? 'Yes' : 'No',
+                cookiesEnabled: navigator.cookieEnabled ? 'Yes' : 'No',
+                localStorage: 'localStorage' in window ? 'Available' : 'Not available',
+                sessionStorage: 'sessionStorage' in window ? 'Available' : 'Not available',
+                indexedDB: 'indexedDB' in window ? 'Available' : 'Not available',
+                cpuClass: navigator.cpuClass || 'Not available',
+                plugins: Array.from(navigator.plugins).map(p => p.name).join(', ') || 'None detected',
+                doNotTrack: navigator.doNotTrack || 'Not set',
+                canvas: await getCanvasFingerprint(),
+                webgl: getWebGLFingerprint(),
+                audio: await getAudioFingerprint(),
+                fonts: await detectFonts(),
+                battery: await getBatteryInfo(),
+                connection: getConnectionInfo(),
+                mediaDevices: await getMediaDevices(),
+                permissions: await getPermissions(),
+            };
+
+            displayInfo(['userAgent', 'language', 'screenResolution', 'platform'], basicInfo);
+            displayInfo(['languages', 'timezone', 'timezoneOffset', 'cookiesEnabled', 'doNotTrack'], advancedInfo);
+            displayInfo(['deviceMemory', 'hardwareConcurrency', 'touchSupport', 'cpuClass'], hardwareInfo);
+            displayInfo(['localStorage', 'sessionStorage', 'indexedDB', 'plugins'], capabilitiesInfo);
+
+            generateCanvasFingerprint();
+            generateWebGLFingerprint();
+            audioFingerprint.textContent = `Audio fingerprint: ${fingerprint.audio}`;
+            fontFingerprint.textContent = `Detected fonts: ${fingerprint.fonts}`;
+
+            const uniquenessPercentage = calculateUniqueness(fingerprint);
+            uniquenessBar.style.width = `${uniquenessPercentage}%`;
+            uniquenessScore.textContent = `${uniquenessPercentage}% Unique`;
+
+            toggleMore.addEventListener('click', () => {
+                moreInfo.style.display = moreInfo.style.display === 'none' ? 'block' : 'none';
+                toggleMore.textContent = moreInfo.style.display === 'none' ? 'Show More Details' : 'Show Less Details';
+            });
+
+            function displayInfo(items, container) {
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'info-item';
+                    div.innerHTML = `<h3>${formatLabel(item)}</h3><p>${fingerprint[item]}</p>`;
+                    container.appendChild(div);
+                });
+            }
+
+            function formatLabel(str) {
+                return str.split(/(?=[A-Z])/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            }
+
+            async function getCanvasFingerprint() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = "top";
+                ctx.font = "14px 'Arial'";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillStyle = "#f60";
+                ctx.fillRect(125, 1, 62, 20);
+                ctx.fillStyle = "#069";
+                ctx.fillText("Hello, world!", 2, 15);
+                ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+                ctx.fillText("Hello, world!", 4, 17);
+                return canvas.toDataURL();
+            }
+
+            function generateCanvasFingerprint() {
+                const ctx = canvasFingerprint.getContext('2d');
+                ctx.textBaseline = "top";
+                ctx.font = "14px 'Arial'";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillStyle = "#f60";
+                ctx.fillRect(125, 1, 62, 20);
+                ctx.fillStyle = "#069";
+                ctx.fillText("Hello, world!", 2, 15);
+                ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+                ctx.fillText("Hello, world!", 4, 17);
+            }
+
+            function getWebGLFingerprint() {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                if (!gl) return 'WebGL not supported';
+                return {
+                    vendor: gl.getParameter(gl.VENDOR),
+                    renderer: gl.getParameter(gl.RENDERER),
+                    version: gl.getParameter(gl.VERSION)
+                };
+            }
+
+            function generateWebGLFingerprint() {
+                const gl = webglFingerprint.getContext('webgl');
+                if (!gl) {
+                    webglFingerprint.style.display = 'none';
+                    return;
+                }
+                const vertices = new Float32Array([-0.5, -0.5, 0.5, -0.5, 0.0, 0.5]);
+                const buffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+                const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+                gl.shaderSource(vertexShader, 'attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }');
+                gl.compileShader(vertexShader);
+                const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+                gl.shaderSource(fragmentShader, 'void main() { gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }');
+                gl.compileShader(fragmentShader);
+                const program = gl.createProgram();
+                gl.attachShader(program, vertexShader);
+                gl.attachShader(program, fragmentShader);
+                gl.linkProgram(program);
+                gl.useProgram(program);
+                const positionLocation = gl.getAttribLocation(program, 'position');
+                gl.enableVertexAttribArray(positionLocation);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+            }
+
+            async function getAudioFingerprint() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const analyser = audioContext.createAnalyser();
+                    const oscillator = audioContext.createOscillator();
+                    const dynamicsCompressor = audioContext.createDynamicsCompressor();
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.setValueAtTime(10000, audioContext.currentTime);
+                    dynamicsCompressor.threshold.setValueAtTime(-50, audioContext.currentTime);
+                    dynamicsCompressor.knee.setValueAtTime(40, audioContext.currentTime);
+                    dynamicsCompressor.ratio.setValueAtTime(12, audioContext.currentTime);
+                    dynamicsCompressor.attack.setValueAtTime(0, audioContext.currentTime);
+                    dynamicsCompressor.release.setValueAtTime(0.25, audioContext.currentTime);
+                    oscillator.connect(dynamicsCompressor);
+                    dynamicsCompressor.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                    oscillator.start(0);
+                    const data = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(data);
+                    oscillator.stop();
+                    return data.slice(0, 16).join(',');
+                } catch (e) {
+                    return 'Audio fingerprinting not available';
+                }
+            }
+
+            async function detectFonts() {
+                const fonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier', 'Verdana', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Arial Black', 'Impact'];
+                const available = [];
+                for (const font of fonts) {
+                    if (document.fonts.check(`12px "${font}"`)) {
+                        available.push(font);
+                    }
+                }
+                return available.join(', ');
+            }
+
+            async function getBatteryInfo() {
+                if ('getBattery' in navigator) {
+                    const battery = await navigator.getBattery();
+                    return `Charging: ${battery.charging}, Level: ${battery.level * 100}%`;
+                }
+                return 'Battery info not available';
+            }
+
+            function getConnectionInfo() {
+                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (connection) {
+                    return `Type: ${connection.effectiveType}, Downlink: ${connection.downlink} Mbps`;
+                }
+                return 'Connection info not available';
+            }
+
+            async function getMediaDevices() {
+                if ('mediaDevices' in navigator && 'enumerateDevices' in navigator.mediaDevices) {
+                    try {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        return devices.map(device => device.kind).join(', ');
+                    } catch (e) {
+                        return 'Access denied';
+                    }
+                }
+                return 'Media devices info not available';
+            }
+
+            async function getPermissions() {
+                if ('permissions' in navigator) {
+                    const permissions = ['geolocation', 'notifications', 'push', 'midi', 'camera', 'microphone', 'background-sync', 'persistent-storage', 'ambient-light-sensor', 'accelerometer', 'gyroscope', 'magnetometer'];
+                    const results = await Promise.all(permissions.map(async (permission) => {
+                        try {
+                            const result = await navigator.permissions.query({name: permission});
+                            return `${permission}: ${result.state}`;
+                        } catch (e) {
+                            return `${permission}: not supported`;
+                        }
+                    }));
+                    return results.join(', ');
+                }
+                return 'Permissions info not available';
+            }
+
+            function calculateUniqueness(fingerprint) {
+                const uniqueFactors = Object.values(fingerprint).filter(value => value !== 'Not available' && value !== '');
+                return Math.min(uniqueFactors.length * 3, 100);
+            }
+        });
+    </script>
+</body>
+</html>

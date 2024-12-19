@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResizeBegins | CheckmateBegins</title>
+    <meta name="description" content="Resize your images with precision and style using ResizeBegins. Fast, free, and easy to use.">
+    <meta name="keywords" content="image resizer, photo resize, picture resize tool, CheckmateBegins">
+    <meta name="author" content="CheckmateBegins">
+    <meta property="og:title" content="ResizeBegins | CheckmateBegins">
+    <meta property="og:description" content="Resize your images with precision and style using ResizeBegins. Fast, free, and easy to use.">
+    <meta name="twitter:card" content="summary_large_image">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: #0f172a;
+            --foreground: #f8fafc;
+            --card: #1e293b;
+            --card-foreground: #f1f5f9;
+            --border: #334155;
+            --input: #334155;
+            --primary: #3b82f6;
+            --primary-foreground: #ffffff;
+            --secondary: #64748b;
+            --secondary-foreground: #ffffff;
+            --accent: #22d3ee;
+            --accent-foreground: #0f172a;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background), #1e1b4b);
+            color: var(--foreground);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--foreground);
+            text-decoration: none;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--foreground);
+            margin: 2px 0;
+            transition: 0.4s;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 3rem 0;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 3rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid var(--border);
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--input);
+            background-color: var(--card);
+            color: var(--card-foreground);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="file"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+        }
+
+        input[type="file"] {
+            padding: 0.5rem;
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: var(--accent);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .preview-container {
+            aspect-ratio: 1;
+            background-color: var(--input);
+            border-radius: 1rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .dimensions {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .card-footer {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--secondary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-message.show {
+            opacity: 1;
+        }
+
+        .status-message.success {
+            background-color: var(--success);
+            color: var(--card);
+        }
+
+        .status-message.error {
+            background-color: var(--error);
+            color: var(--card-foreground);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: rgba(0, 0, 0, 0.9);
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .card-content {
+                padding: 1rem;
+            }
+
+            .card-footer {
+                padding: 1rem;
+            }
+
+            input[type="file"],
+            input[type="number"],
+            button {
+                font-size: 0.875rem;
+            }
+
+            .dimensions {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .card-content {
+                padding: 0.75rem;
+            }
+
+            .card-footer {
+                padding: 0.75rem;
+            }
+
+            input[type="file"],
+            input[type="number"],
+            button {
+                font-size: 0.8125rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">CheckmateBegins</div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="nav-links" id="nav-links">
+                <a href="https://begins.site/about.html">About</a>
+                <a href="https://begins.site/blog/">Blogs</a>
+                <a href="https://begins.site/visitorip.html">Your IP</a>
+                <a href="https://begins.site/StartCrypt.html">Encrypt</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>ResizeBegins</h1>
+        <p class="subtitle">Resize your images with precision and style</p>
+
+        <div class="card">
+            <div class="card-content">
+                <div class="grid">
+                    <div>
+                        <div class="input-group">
+                            <label for="image-upload">Upload Image</label>
+                            <input type="file" id="image-upload" accept="image/*">
+                        </div>
+                        <div id="resize-controls" class="hidden">
+                            <div class="input-group">
+                                <label for="width">Width (px)</label>
+                                <input type="number" id="width" placeholder="Enter width">
+                            </div>
+                            <div class="input-group">
+                                <label for="height">Height (px)</label>
+                                <input type="number" id="height" placeholder="Enter height">
+                            </div>
+                            <button id="resize-btn">Resize Image</button>
+                        </div>
+                    </div>
+                    <div class="preview-container">
+                        <canvas id="preview"></canvas>
+                        <div class="dimensions hidden" id="dimensions"></div>
+                    </div>
+                </div>
+                <div id="status-message" class="status-message"></div>
+            </div>
+            <div class="card-footer">
+                <button id="download-btn" disabled>Download Resized Image</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Begins.site. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const imageUpload = document.getElementById('image-upload');
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const resizeBtn = document.getElementById('resize-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const preview = document.getElementById('preview');
+        const dimensions = document.getElementById('dimensions');
+        const resizeControls = document.getElementById('resize-controls');
+        const statusMessage = document.getElementById('status-message');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+
+        let originalImage = null;
+
+        imageUpload.addEventListener('change', handleImageUpload);
+        widthInput.addEventListener('input', maintainAspectRatio);
+        heightInput.addEventListener('input', maintainAspectRatio);
+        resizeBtn.addEventListener('click', resizeImage);
+        downloadBtn.addEventListener('click', downloadImage);
+        mobileMenu.addEventListener('click', toggleMobileMenu);
+
+        function toggleMobileMenu() {
+            navLinks.classList.toggle('show');
+            document.body.classList.toggle('no-scroll');
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    originalImage = new Image();
+                    originalImage.onload = function() {
+                        updateCanvas(originalImage.width, originalImage.height);
+                        widthInput.value = originalImage.width;
+                        heightInput.value = originalImage.height;
+                        resizeControls.classList.remove('hidden');
+                        dimensions.classList.remove('hidden');
+                        showStatus('Image uploaded successfully!', 'success');
+                    };
+                    originalImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function maintainAspectRatio(e) {
+            if (!originalImage) return;
+
+            const aspectRatio = originalImage.width / originalImage.height;
+            if (e.target.id === 'width') {
+                heightInput.value = Math.round(e.target.value / aspectRatio);
+            } else {
+                widthInput.value = Math.round(e.target.value * aspectRatio);
+            }
+        }
+
+        function resizeImage() {
+            if (!originalImage) return;
+
+            const width = parseInt(widthInput.value);
+            const height = parseInt(heightInput.value);
+            
+            if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+                showStatus('Please enter valid dimensions.', 'error');
+                return;
+            }
+
+            updateCanvas(width, height);
+            showStatus('Image resized successfully!', 'success');
+        }
+
+        function updateCanvas(width, height) {
+            const ctx = preview.getContext('2d');
+            preview.width = width;
+            preview.height = height;
+            ctx.drawImage(originalImage, 0, 0, width, height);
+            dimensions.textContent = `${width} x ${height}`;
+            downloadBtn.disabled = false;
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'resized-image.png';
+            link.href = preview.toDataURL();
+            link.click();
+            showStatus('Image downloaded successfully!', 'success');
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.classList.add('show');
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        // Sticky header
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop) {
+                document.querySelector('header').style.transform = 'translateY(-100%)';
+            } else {
+                document.querySelector('header').style.transform = 'translateY(0)';
+            }
+            lastScrollTop = scrollTop;
+        });
+    </script>
+</body>
+</html>

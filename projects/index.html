@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Projects - CheckmateBegins</title>
+    <meta name="description" content="Explore the latest completed cybersecurity tools and web pages from CheckmateBegins. Discover innovative solutions for online security and productivity.">
+    <link rel="icon" type="image/png" href="../title.png">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #333333;
+            --highlight-color: #4a4a4a;
+            --transition-duration: 0.3s;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        header {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            height: 80px;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links li { margin-left: 2rem; }
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding-bottom: 5px;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--text-color);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .menu-toggle { display: none; cursor: pointer; font-size: 1.5rem; }
+        main {
+            padding-top: 100px;
+            min-height: calc(100vh - 100px);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        .project-filter {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 2rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background-color: var(--highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .project-card {
+            background-color: var(--accent-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+        }
+        .project-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .project-card h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--highlight-color);
+            transition: width 0.3s ease;
+        }
+        .project-card:hover h2::after {
+            width: 100%;
+        }
+        .project-card p {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .project-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .project-card .tag {
+            background-color: var(--highlight-color);
+            color: var(--text-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .project-card a {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--highlight-color);
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .project-card a:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media screen and (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                padding: 1rem 0;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links li { margin: 1rem 0; }
+            .menu-toggle { display: block; }
+            .project-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="https://begins.site" class="logo">CheckmateBegins</a>
+            <ul class="nav-links">
+                <li><a href="https://begins.site">Home</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../blog">Blogs</a></li>
+                <li><a href="../visitorip.html">Your IP</a></li>
+                <li><a href="../StartCrypt.html">Encrypt</a></li>
+            </ul>
+            <div class="menu-toggle">☰</div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Projects</h1>
+            <div class="project-filter">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="tool">Tools</button>
+                <button class="filter-btn" data-filter="security">Security</button>
+                <button class="filter-btn" data-filter="utility">Utilities</button>
+            </div>
+            <div class="project-list" id="projectList">
+                <!-- Project cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </main>
+    
+<div style="height: 50px;"></div>
+
+    <script>
+        const projects = [
+            {
+                title: "Age Calculator",
+                description: "Calculate your age with precision using our advanced age calculator tool. Get accurate results down to the day.",
+                tags: ["tool", "utility"],
+                link: "age-calc.html"
+            },
+            {
+                title: "QR Code Generator",
+                description: "Generate custom QR codes for various purposes with our easy-to-use QR code generator. Perfect for businesses and personal use.",
+                tags: ["tool", "utility"],
+                link: "QR-Gen.html"
+            },
+            {
+                title: "Steganography Tool",
+                description: "Hide secret messages within images using our cutting-edge steganography tool. Ensure your communications remain private and secure.",
+                tags: ["security", "tool"],
+                link: "steganography-tool"
+            },
+            {
+                title: "Text To Speech",
+                description: "Listen to any text with our Text To Speech tool & choose speed, voice, and pitch as you like.",
+                tags: ["tool", "utility"],
+                link: "text-to-speech"
+            },
+            {
+                title: "Code Playground",
+                description: "Easily write & check HTML, CSS, and JavaScript in our coding playground which is completely free to use.",
+                tags: ["tool", "utility"],
+                link: "playground.html"
+            },
+            {
+                title: "DorkXplorer",
+                description: "Easy Google Dorking learning and information gathering tool.",
+                tags: ["security", "tool"],
+                link: "dorkxplorer"
+            },
+            {
+                title: "Browser Fingerprinting",
+                description: "Easily find your browser's detailed information all in one place.",
+                tags: ["security", "tool"],
+                link: "browserfingerprinting"
+            },
+            {
+                title: "CyberLex",
+                description: "All cybersecurity topics explained in a very concise form to learn faster.",
+                tags: ["security", "utility"],
+                link: "cyberlex"
+            },
+            {
+                title: "VisitorInfo",
+                description: "Find information about your device and your browser easily in one place.",
+                tags: ["tool", "utility"],
+                link: "visitorinfo"
+            },
+            {
+                title: "ResizeBegins",
+                description: "Resize your images with precision and style using ResizeBegins. Fast, free, and easy to use.",
+                tags: ["tool", "utility"],
+                link: "ResizeBegins"
+            },
+            {
+                title: "CyberDesk",
+                description: "Hack your way to victory in CyberDesk, the ultimate mission-based hacking simulation game.",
+                tags: ["security", "utility"],
+                link: "cyberdesk"
+            }
+        ];
+
+        function createProjectCard(project) {
+            return `
+                <div class="project-card" data-tags="${project.tags.join(' ')}">
+                    <h2>${project.title}</h2>
+                    <p>${project.description}</p>
+                    <div class="tags">
+                        ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <a href="${project.link}" target="_blank">Try it out</a>
+                </div>
+            `;
+        }
+
+        function loadProjects() {
+            const projectList = document.getElementById('projectList');
+            projectList.innerHTML = projects.map(createProjectCard).join('');
+        }
+
+        function filterProjects(filter) {
+            const projectCards = document.querySelectorAll('.project-card');
+            projectCards.forEach(card => {
+                const tags = card.dataset.tags.split(' ');
+                if (filter === 'all' || tags.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    filterProjects(button.dataset.filter);
+                });
+            });
+
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            const navItems = document.querySelectorAll('.nav-links a');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = e.target;
+                    target.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        target.style.transform = 'scale(1)';
+                        window.location.href = target.href;
+                    }, 200);
+                });
+            });
+
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                const scrollPosition = window.scrollY;
+
+                if (scrollPosition > 50) {
+                    header.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                    header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+                    header.style.boxShadow = 'none';
+                }
+            });
+
+            const projectCards = document.querySelectorAll('.project-card');
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            projectCards.forEach(card => {
+                card.style.animationPlayState = 'paused';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

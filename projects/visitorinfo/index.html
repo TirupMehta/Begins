@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Analytics | Begins.site</title>
+    <meta name="description" content="Explore free cybersecurity resources with CheckmateBegins. Access data, courses, and tools to enhance your knowledge.">
+    <link rel="icon" type="image/png" href="../title.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #2d2d2d;
+            --accent-color: #4f46e5;
+            --text-color: #ffffff;
+            --text-secondary: #a3a3a3;
+            --card-background: #2d2d2d;
+            --success-color: #22c55e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--secondary-color);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 7rem 2rem 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(to right, #4f46e5, #22c55e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientText 3s ease infinite;
+        }
+
+        @keyframes gradientText {
+            0%, 100% {
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                filter: hue-rotate(60deg);
+            }
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            perspective: 1000px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary-color);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent-color);
+        }
+
+        .card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 6rem 1rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80% { content: '....'; }
+            100% { content: '.....'; }
+        }
+
+        .copyright {
+            background: linear-gradient(45deg, var(--accent-color), var(--success-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h2>CheckmateBegins</h2>
+    </nav>
+    
+    <div class="container">
+        <h1>Visitor Analytics Dashboard</h1>
+        <div class="dashboard">
+            <div class="card">
+                <h2>IP Address</h2>
+                <p id="ip">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Location</h2>
+                <p id="location">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Browser</h2>
+                <p id="browser">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Operating System</h2>
+                <p id="os">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Device</h2>
+                <p id="device">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Screen Resolution</h2>
+                <p id="screen">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Language</h2>
+                <p id="language">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Time Zone</h2>
+                <p id="timezone">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Connection Type</h2>
+                <p id="connection">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Do Not Track</h2>
+                <p id="dnt">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Cookies Enabled</h2>
+                <p id="cookies">Loading...</p>
+            </div>
+        </div>
+        <p class="loading">Analyzing visitor data</p>
+        <footer class="footer">
+            <p>© 2024 <span class="copyright">Begins.site</span>. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        function getOS() {
+            const userAgent = window.navigator.userAgent,
+                  platform = window.navigator.platform,
+                  macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+                  windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+                  iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+
+            if (macosPlatforms.indexOf(platform) !== -1) {
+                return 'macOS';
+            } else if (iosPlatforms.indexOf(platform) !== -1) {
+                return 'iOS';
+            } else if (windowsPlatforms.indexOf(platform) !== -1) {
+                return 'Windows';
+            } else if (/Android/.test(userAgent)) {
+                return 'Android';
+            } else if (/Linux/.test(platform)) {
+                return 'Linux';
+            }
+
+            return 'Unknown OS';
+        }
+
+        function getBrowser() {
+            const ua = navigator.userAgent;
+            let browserName;
+
+            if (ua.match(/chrome|chromium|crios/i)) {
+                browserName = "Chrome";
+            } else if (ua.match(/firefox|fxios/i)) {
+                browserName = "Firefox";
+            } else if (ua.match(/safari/i)) {
+                browserName = "Safari";
+            } else if (ua.match(/opr\//i)) {
+                browserName = "Opera";
+            } else if (ua.match(/edg/i)) {
+                browserName = "Edge";
+            } else {
+                browserName = "Unknown";
+            }
+
+            return browserName;
+        }
+
+        function getDeviceType() {
+            const ua = navigator.userAgent;
+            if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+                return "Tablet";
+            }
+            if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+                return "Mobile";
+            }
+            return "Desktop";
+        }
+
+        function saveVisitorInfo(data) {
+            fetch('save_info.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Animate cards on scroll
+        function animateCards() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('show');
+                }, index * 100);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const visitorInfo = {};
+            animateCards();
+
+            // Browser
+            visitorInfo.browser = getBrowser();
+            document.getElementById('browser').textContent = visitorInfo.browser;
+
+            // Operating System
+            visitorInfo.os = getOS();
+            document.getElementById('os').textContent = visitorInfo.os;
+
+            // Screen Resolution
+            visitorInfo.screen = `${window.screen.width}x${window.screen.height}`;
+            document.getElementById('screen').textContent = visitorInfo.screen;
+
+            // Device Type
+            visitorInfo.device = getDeviceType();
+            document.getElementById('device').textContent = visitorInfo.device;
+
+            // Language
+            visitorInfo.language = navigator.language || navigator.userLanguage;
+            document.getElementById('language').textContent = visitorInfo.language;
+
+            // Time Zone
+            visitorInfo.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('timezone').textContent = visitorInfo.timezone;
+
+            // Connection Type
+            if ('connection' in navigator) {
+                visitorInfo.connection = navigator.connection.effectiveType || 'Unknown';
+            } else {
+                visitorInfo.connection = 'Not Available';
+            }
+            document.getElementById('connection').textContent = visitorInfo.connection;
+
+            // Do Not Track
+            visitorInfo.dnt = navigator.doNotTrack || 'Not Available';
+            document.getElementById('dnt').textContent = visitorInfo.dnt;
+
+            // Cookies Enabled
+            visitorInfo.cookies = navigator.cookieEnabled ? 'Enabled' : 'Disabled';
+            document.getElementById('cookies').textContent = visitorInfo.cookies;
+
+            // IP Address and Location
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    visitorInfo.ip = data.ip;
+                    visitorInfo.location = `${data.city}, ${data.region}, ${data.country_name}`;
+
+                    document.getElementById('ip').textContent = visitorInfo.ip;
+                    document.getElementById('location').textContent = visitorInfo.location;
+                    
+                    document.querySelector('.loading').style.display = 'none';
+
+                    // Save visitor information
+                    saveVisitorInfo(visitorInfo);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('ip').textContent = 'Unable to fetch';
+                    document.getElementById('location').textContent = 'Unable to fetch';
+                    document.querySelector('.loading').textContent = 'Some information could not be loaded';
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced SEO Meta Extractor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --chart-color-1: #3498db;
+            --chart-color-2: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2 {
+            color: var(--secondary-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        #urlForm {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        #urlInput {
+            width: 70%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 4px 0 0 4px;
+            transition: border-color 0.3s ease;
+        }
+
+        #urlInput:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        #submitBtn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #submitBtn:hover {
+            background-color: #2980b9;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #results {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #results.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section ul {
+            list-style-type: none;
+            padding-left: 1rem;
+        }
+
+        .section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-container {
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        #exportBtn {
+            display: none;
+            margin: 2rem auto;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #exportBtn:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            #urlForm {
+                flex-direction: column;
+            }
+
+            #urlInput {
+                width: 100%;
+                border-radius: 4px;
+                margin-bottom: 1rem;
+            }
+
+            #submitBtn {
+                width: 100%;
+                border-radius: 4px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced SEO Meta Extractor</h1>
+        <form id="urlForm">
+            <input type="url" id="urlInput" placeholder="Enter website URL (e.g., https://example.com)" required>
+            <button type="submit" id="submitBtn">Analyze</button>
+        </form>
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing website...</p>
+        </div>
+        <div id="results"></div>
+        <button id="exportBtn">Export Results to CSV</button>
+    </div>
+    <footer>
+        &copy; 2023 Advanced SEO Meta Extractor. All rights reserved.
+    </footer>
+
+    <script>
+        const urlForm = document.getElementById('urlForm');
+        const urlInput = document.getElementById('urlInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const exportBtn = document.getElementById('exportBtn');
+
+        let analysisResults = null;
+
+        urlForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = urlInput.value;
+
+            results.innerHTML = '';
+            results.classList.remove('show');
+            loading.style.display = 'block';
+            exportBtn.style.display = 'none';
+
+            try {
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                const html = data.contents;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                analysisResults = analyzeWebsite(doc, url);
+
+                loading.style.display = 'none';
+                results.innerHTML = generateResultsHTML(analysisResults);
+                setTimeout(() => {
+                    results.classList.add('show');
+                    generateCharts(analysisResults);
+                }, 100);
+                exportBtn.style.display = 'block';
+            } catch (error) {
+                loading.style.display = 'none';
+                results.innerHTML = `<p style="color: var(--error-color);">Error: ${error.message}</p>`;
+                results.classList.add('show');
+            }
+        });
+
+        function analyzeWebsite(doc, url) {
+            return {
+                basicSEO: {
+                    title: doc.title,
+                    description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || 'Not found',
+                    keywords: doc.querySelector('meta[name="keywords"]')?.getAttribute('content') || 'Not found',
+                    canonicalURL: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || 'Not found'
+                },
+                socialMedia: {
+                    ogTitle: doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || 'Not found',
+                    ogDescription: doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || 'Not found',
+                    ogImage: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'Not found',
+                    twitterCard: doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || 'Not found',
+                    twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || 'Not found',
+                    twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || 'Not found'
+                },
+                headers: {
+                    h1: Array.from(doc.querySelectorAll('h1')).map(h => h.textContent.trim()),
+                    h2: Array.from(doc.querySelectorAll('h2')).map(h => h.textContent.trim()),
+                    h3: Array.from(doc.querySelectorAll('h3')).map(h => h.textContent.trim())
+                },
+                robotsSitemap: {
+                    robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || 'Not found',
+                    sitemap: doc.querySelector('link[rel="sitemap"]')?.getAttribute('href') || 'Not found'
+                },
+                links: analyzeLinkData(doc, url),
+                performance: {
+                    httpsStatus: url.startsWith('https') ? 'Secure' : 'Not secure',
+                    contentSecurityPolicy: doc.querySelector('meta[http-equiv="Content-Security-Policy"]')?.getAttribute('content') || 'Not found'
+                },
+                misc: {
+                    language: doc.documentElement.lang || 'Not specified',
+                    charset: doc.characterSet
+                },
+                imageAnalysis: analyzeImages(doc),
+                structuredData: analyzeStructuredData(doc),
+                accessibility: analyzeAccessibility(doc)
+            };
+        }
+
+        function analyzeLinkData(doc, url) {
+            const links = doc.querySelectorAll('a');
+            let internalLinks = 0;
+            let externalLinks = 0;
+            const linkData = [];
+
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                    const isExternal = href.startsWith('http') && !href.includes(url);
+                    linkData.push({
+                        type: isExternal ? 'External' : 'Internal',
+                        href: href,
+                        anchorText: link.textContent.trim(),
+                        target: link.getAttribute('target') || 'Not set'
+                    });
+                    isExternal ? externalLinks++ : internalLinks++;
+                }
+            });
+
+            return {
+                internalLinksCount: internalLinks,
+                externalLinksCount: externalLinks,
+                linkData: linkData
+            };
+        }
+
+        function analyzeImages(doc) {
+            const images = doc.querySelectorAll('img');
+            let imagesWithAlt = 0;
+            let imagesWithoutAlt = 0;
+
+            images.forEach(img => {
+                img.hasAttribute('alt') ? imagesWithAlt++ : imagesWithoutAlt++;
+            });
+
+            return {
+                totalImages: images.length,
+                imagesWithAlt: imagesWithAlt,
+                imagesWithoutAlt: imagesWithoutAlt
+            };
+        }
+
+        function analyzeStructuredData(doc) {
+            const structuredData = doc.querySelectorAll('script[type="application/ld+json"]');
+            return Array.from(structuredData).map(script => {
+                try {
+                    return JSON.parse(script.textContent);
+                } catch (e) {
+                    return { error: 'Invalid JSON' };
+                }
+            });
+        }
+
+        function analyzeAccessibility(doc) {
+            const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            const headingOrder = Array.from(headings).map(h => parseInt(h.tagName.slice(1)));
+            const isCorrectOrder = headingOrder.every((num, i) => i === 0 || num <= headingOrder[i - 1] + 1);
+
+            return {
+                headingStructure: isCorrectOrder ? 'Correct' : 'Incorrect',
+                imageAltTexts: analyzeImages(doc).imagesWithAlt === analyzeImages(doc).totalImages
+            };
+        }
+
+        function generateResultsHTML(results) {
+            return `
+                ${generateSection('Basic SEO Metadata', results.basicSEO)}
+                ${generateSection('Social Media Metadata', results.socialMedia)}
+                ${generateHeaderSection(results.headers)}
+                ${generateSection('Robots and Sitemap Details', results.robotsSitemap)}
+                ${generateLinkSection(results.links)}
+                ${generateSection('Performance and Security Indicators', results.performance)}
+                ${generateSection('Image Analysis', results.imageAnalysis)}
+                ${generateStructuredDataSection(results.structuredData)}
+                ${generateAccessibilitySection(results.accessibility)}
+                ${generateSection('Miscellaneous Information', results.misc)}
+                ${generateChartSection()}
+            `;
+        }
+
+        function generateSection(title, data) {
+            return `
+                <div class="section">
+                    <h2>${title}</h2>
+                    ${Object.entries(data).map(([key, value]) => `
+                        <p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</p>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function generateHeaderSection(headers) {
+            return `
+                <div class="section">
+                    <h2>Header Tag Information</h2>
+                    ${Object.entries(headers).map(([tag, values]) => `
+                        <h3>${tag.toUpperCase()} Tags:</h3>
+                        <ul>
+                            ${values.map(value => `<li>${value}</li>`).join('')}
+                        </ul>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function generateLinkSection(links) {
+            return `
+                <div class="section">
+                    <h2>Link Data</h2>
+                    <p><strong>Total Internal Links:</strong> ${links.internalLinksCount}</p>
+                    <p><strong>Total External Links:</strong> ${links.externalLinksCount}</p>
+                    <h3>Link Details:</h3>
+                    <ul>
+                        ${links.linkData.map(link => `
+                            <li>
+                                <strong>${link.type} Link:</strong> ${link.href}
+                                <br><strong>Anchor Text:</strong> ${link.anchorText}
+                                <br><strong>Target:</strong> ${link.target}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function generateStructuredDataSection(structuredData) {
+            return `
+                <div class="section">
+                    <h2>Structured Data</h2>
+                    <pre>${JSON.stringify(structuredData, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        function generateAccessibilitySection(accessibility) {
+            return `
+                <div class="section">
+                    <h2>Accessibility</h2>
+                    <p><strong>Heading Structure:</strong> ${accessibility.headingStructure}</p>
+                    <p><strong>All Images Have Alt Text:</strong> ${accessibility.imageAltTexts ? 'Yes' : 'No'}</p>
+                </div>
+            `;
+        }
+
+        function generateChartSection() {
+            return `
+                <div class="section">
+                    <h2>Visual Analysis</h2>
+                    <div class="chart-container">
+                        <canvas id="linkChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="imageChart"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCharts(results) {
+            new Chart(document.getElementById('linkChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Internal Links', 'External Links'],
+                    datasets: [{
+                        data: [results.links.internalLinksCount, results.links.externalLinksCount],
+                        backgroundColor: [
+                            'var(--chart-color-1)',
+                            'var(--chart-color-2)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Link Distribution'
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('imageChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Images with Alt Text', 'Images without Alt Text'],
+                    datasets: [{
+                        data: [results.imageAnalysis.imagesWithAlt, results.imageAnalysis.imagesWithoutAlt],
+                        backgroundColor: [
+                            'var(--chart-color-1)',
+                            'var(--chart-color-2)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Image Accessibility Analysis'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        exportBtn.addEventListener('click', () => {
+            if (!analysisResults) return;
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Category,Key,Value\n";
+
+            function addToCSV(category, obj) {
+                for (let [key, value] of Object.entries(obj)) {
+                    if (typeof value === 'object' && value !== null) {
+                        addToCSV(`${category} - ${key}`, value);
+                    } else {
+                        csvContent += `${category},${key},${value}\n`;
+                    }
+                }
+            }
+
+            for (let [category, data] of Object.entries(analysisResults)) {
+                addToCSV(category, data);
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "seo_analysis.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    </script>
+</body>
+</html>

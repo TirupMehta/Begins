@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DorkXplorer - Advanced Google Dorking Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto p-4">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-blue-600">DorkXplorer</h1>
+            <p class="text-xl text-gray-600">Advanced Google Dorking Tool by CheckmateBegins</p>
+        </header>
+
+        <main class="bg-white rounded-lg shadow-lg p-6">
+            <div class="mb-4">
+                <input type="text" id="dorkInput" placeholder="Enter your dork or use the builder below" class="w-full p-2 border rounded text-lg">
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button onclick="executeDork()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Execute Dork</button>
+                <button onclick="clearDork()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition">Clear</button>
+                <button onclick="randomDork()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Random Dork</button>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">Dork Builder</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2" id="dorkComponents"></div>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">Quick Dorks</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" id="quickDorks"></div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold mb-2">Advanced Techniques</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="advancedDorks"></div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-8 text-gray-600">
+            <p>&copy; 2024 DorkXplorer by CheckmateBegins. All rights reserved.</p>
+            <p><a href="https://Begins.site" class="text-blue-500 hover:underline">Begins.site</a> | <a href="https://begins.site/terms-and-conditions.html" id="disclaimer-link" class="text-blue-500 hover:underline">Disclaimer</a></p>
+        </footer>
+    </div>
+
+    <script>
+        const dorkComponents = [
+            { type: 'site:', description: 'Limit results to a specific website or domain' },
+            { type: 'filetype:', description: 'Search for specific file types' },
+            { type: 'inurl:', description: 'Search for keywords in the URL' },
+            { type: 'intitle:', description: 'Search for keywords in the page title' },
+            { type: 'intext:', description: 'Search for keywords in the page content' },
+            { type: 'ext:', description: 'Search for specific file extensions' },
+            { type: 'before:', description: 'Search for pages indexed before a specific date' },
+            { type: 'after:', description: 'Search for pages indexed after a specific date' },
+            { type: 'allintext:', description: 'Search for multiple keywords in the page content' },
+            { type: 'related:', description: 'Find pages related to a specific URL' },
+            { type: 'cache:', description: 'View Google\'s cached version of a page' },
+            { type: 'inanchor:', description: 'Search for keywords in link anchor text' },
+            { type: 'allinanchor:', description: 'Search for multiple keywords in link anchor text' },
+            { type: 'define:', description: 'Get the definition of a word or phrase' },
+            { type: '-', description: 'Exclude results containing a specific term' },
+            { type: 'OR', description: 'Search for results matching either of two terms' },
+            { type: 'AND', description: 'Search for results matching both terms' },
+        ];
+
+        const quickDorks = [
+            { title: 'Public FTP Servers', dork: 'inurl:ftp "login" filetype:log' },
+            { title: 'Open Directories', dork: 'intitle:"Index of /" +server.at' },
+            { title: 'Exposed Webcams', dork: 'inurl:/view/index.shtml' },
+            { title: 'WordPress Config Files', dork: 'filetype:env "DB_PASSWORD"' },
+            { title: 'Git Config Files', dork: 'filename:.git-credentials' },
+            { title: 'Apache2 Config Files', dork: 'filetype:conf inurl:apache2.conf' },
+        ];
+
+        const advancedDorks = {
+            'File Discovery': [
+                { title: 'Exposed Credentials in Code', dork: 'site:github.com intext:"API_KEY" OR intext:"API_SECRET" OR intext:"password" OR intext:"credentials" ext:yml OR ext:yaml OR ext:json OR ext:env' },
+                { title: 'Sensitive Documents in Cloud Storage', dork: 'site:s3.amazonaws.com OR site:storage.googleapis.com OR site:blob.core.windows.net filetype:pdf OR filetype:doc OR filetype:docx intext:"confidential" OR intext:"internal use only"' },
+                { title: 'Exposed Database Backups', dork: 'ext:sql OR ext:db OR ext:backup intext:"INSERT INTO" OR intext:"CREATE TABLE"' }
+            ],
+            'Vulnerability Scanning': [
+                { title: 'GraphQL Introspection', dork: 'inurl:"/graphql" OR inurl:"/graphiql" -site:github.com -site:gitlab.com' },
+                { title: 'JWT Token Exposure', dork: 'intext:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ" ext:log OR ext:txt OR ext:conf' },
+                { title: 'Exposed Docker API', dork: 'inurl:":2375/version" OR inurl:":2376/version" "Docker" "API Version"' }
+            ],
+            'Information Disclosure': [
+                { title: 'Exposed Kubernetes Dashboards', dork: 'intitle:"Kubernetes Dashboard" inurl:"/api/v1/namespaces"' },
+                { title: 'Jenkins Build Logs', dork: 'intitle:"Jenkins" inurl:"/job/" intext:"Started by" ext:log' },
+                { title: 'Exposed Prometheus Metrics', dork: 'inurl:"/metrics" intext:"prometheus_" -site:github.com -site:gitlab.com' }
+            ],
+            'Network Reconnaissance': [
+                { title: 'Exposed Network Devices', dork: 'intitle:"RouterOS" OR intitle:"MikroTik" inurl:"/winbox" OR intext:"Telnet" OR intext:"SSH"' },
+                { title: 'IoT Device Discovery', dork: 'intitle:"IP Camera" OR intitle:"Network Camera" inurl:"/view/index.shtml"' },
+                { title: 'Exposed Industrial Control Systems', dork: 'inurl:"/Portal/Portal.mwsl" OR intext:"Schneider Electric" OR intext:"Siemens" OR intext:"Allen-Bradley" intitle:"Login"' }
+            ]
+        };
+
+        function renderDorkComponents() {
+            const container = document.getElementById('dorkComponents');
+            dorkComponents.forEach(component => {
+                const button = document.createElement('button');
+                button.textContent = component.type;
+                button.className = 'bg-gray-200 text-gray-800 px-3 py-2 rounded hover:bg-gray-300 transition tooltip';
+                button.onclick = () => addToDork(component.type);
+                button.title = component.description;
+                container.appendChild(button);
+            });
+        }
+
+        function renderQuickDorks() {
+            const container = document.getElementById('quickDorks');
+            quickDorks.forEach(dork => {
+                const button = document.createElement('button');
+                button.textContent = dork.title;
+                button.className = 'w-full text-left bg-gray-100 p-2 rounded hover:bg-gray-200 transition';
+                button.onclick = () => setDork(dork.dork);
+                container.appendChild(button);
+            });
+        }
+
+        function renderAdvancedDorks() {
+            const container = document.getElementById('advancedDorks');
+            Object.entries(advancedDorks).forEach(([category, dorks]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'mb-4';
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.textContent = category;
+                categoryTitle.className = 'text-xl font-bold mb-2';
+                categoryDiv.appendChild(categoryTitle);
+                dorks.forEach(dork => {
+                    const dorkButton = document.createElement('button');
+                    dorkButton.textContent = dork.title;
+                    dorkButton.className = 'w-full text-left bg-gray-100 p-2 rounded mb-2 hover:bg-gray-200 transition';
+                    dorkButton.onclick = () => setDork(dork.dork);
+                    categoryDiv.appendChild(dorkButton);
+                });
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function addToDork(component) {
+            const dorkInput = document.getElementById('dorkInput');
+            dorkInput.value += component + ' ';
+            dorkInput.focus();
+        }
+
+        function setDork(dork) {
+            document.getElementById('dorkInput').value = dork;
+        }
+
+        function executeDork() {
+            const dork = document.getElementById('dorkInput').value.trim();
+            if (dork !== '') {
+                window.open(`https://www.google.com/search?q=${encodeURIComponent(dork)}`, '_blank');
+            }
+        }
+
+        function clearDork() {
+            document.getElementById('dorkInput').value = '';
+        }
+
+        function randomDork() {
+            const allDorks = [
+                ...quickDorks,
+                ...Object.values(advancedDorks).flat()
+            ];
+            const randomDork = allDorks[Math.floor(Math.random() * allDorks.length)];
+            setDork(randomDork.dork);
+        }
+
+        document.getElementById('disclaimer-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert("Disclaimer: DorkMaster Pro is designed for ethical use by cybersecurity professionals. Users are responsible for complying with all applicable laws and regulations. CheckmateBegins is not liable for any misuse of this tool.");
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDorkComponents();
+            renderQuickDorks();
+            renderAdvancedDorks();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                executeDork();
+            }
+        });
+    </script>
+</body>
+</html>

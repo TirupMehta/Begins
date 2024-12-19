@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa 0%, #e8eaf6 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: #2196f3;
+        }
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 0;
+        }
+        .excuse {
+            font-style: italic;
+            color: #666;
+            height: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #1976d2;
+        }
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid #2196f3;
+            color: #2196f3;
+        }
+        .btn-outline:hover {
+            background-color: #e3f2fd;
+        }
+        footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        footer a {
+            color: #2196f3;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 0.5s linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <h2>Oops! Page Not Found</h2>
+        <p class="excuse" id="excuse">"The file is on a coffee break"</p>
+        <a href="/" class="btn">Go back home</a>
+        <button class="btn btn-outline" id="newExcuse">
+            <span id="refreshIcon">↻</span> Get another excuse
+        </button>
+    </div>
+    <footer>
+        &copy; 2023 <a href="https://begins.site" target="_blank" rel="noopener noreferrer">CheckmateBegins</a>
+    </footer>
+
+    <script>
+        const funnyExcuses = [
+            "The file is on a coffee break",
+            "Our pixels are shy today",
+            "The data took a wrong turn",
+            "Bits and bytes on vacation",
+            "File's playing hide and seek",
+            "Oops, we misplaced some 1's and 0's",
+            "The internet gremlins struck again",
+            "Your file joined a circus",
+            "It's nap time for your data",
+            "The file's exploring parallel universes"
+        ];
+
+        const excuseElement = document.getElementById('excuse');
+        const newExcuseButton = document.getElementById('newExcuse');
+        const refreshIcon = document.getElementById('refreshIcon');
+
+        function getRandomExcuse() {
+            const newExcuse = funnyExcuses[Math.floor(Math.random() * funnyExcuses.length)];
+            excuseElement.textContent = `"${newExcuse}"`;
+            refreshIcon.classList.add('spin');
+            setTimeout(() => refreshIcon.classList.remove('spin'), 500);
+        }
+
+        newExcuseButton.addEventListener('click', getRandomExcuse);
+
+        setInterval(getRandomExcuse, 5000);
+    </script>
+</body>
+</html>

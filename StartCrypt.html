@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="StartCrypt" />
+    <meta name="description" content="Secured message Encrytion tool developed by CheckmateBegins." />
+    <title>StartCrypt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent: #333333;
+            --accent-hover: #444444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--text-primary);
+            animation: pulse 2s infinite;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+            box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background-color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+
+        button:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0s;
+        }
+
+        #result, #error {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        #result {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--text-secondary);
+        }
+
+        #error {
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+
+        #result.show, #error.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: var(--text-secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            textarea, button {
+                font-size: 0.9rem;
+            }
+        }
+        .copyright {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .copyright:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles"></div>
+    <div class="container">
+        <div class="card">
+            <h1>StartCrypt</h1>
+            <div class="input-group">
+                <textarea id="input" rows="4" placeholder="Enter your text here"></textarea>
+            </div>
+            <div class="button-group">
+                <button onclick="processText('encrypt')">Encrypt</button>
+                <button onclick="processText('decrypt')">Decrypt</button>
+            </div>
+            <div id="result"></div>
+            <div id="error"></div>
+            <div class="button-group" style="margin-top: 1rem;">
+                <button onclick="window.location.href='https://begins.site'">Go to Homepage</button>
+            </div>
+        </div>
+        <footer>
+            &copy; 2024 CheckmateBegins. All rights reserved. Unauthorized use of the code for commercial purposes or to create derivative works is strictly prohibited. CheckmateBegins is not liable for any misuse of this tool.
+        </footer>
+    </div>
+
+    <div class="copyright"><a href="https://begins.site" style="color: #ffffff;">© CheckmateBegins</a></div>
+
+    <script>
+        const SHIFT = 13;
+
+        function customEncrypt(text) {
+            return text.split('').map(char => {
+                if (char.match(/[a-z]/i)) {
+                    const code = char.charCodeAt(0);
+                    if ((code >= 65) && (code <= 90))
+                        return String.fromCharCode(((code - 65 + SHIFT) % 26) + 65);
+                    if ((code >= 97) && (code <= 122))
+                        return String.fromCharCode(((code - 97 + SHIFT) % 26) + 97);
+                }
+                return char;
+            }).join('');
+        }
+
+        function customDecrypt(text) {
+            return text.split('').map(char => {
+                if (char.match(/[a-z]/i)) {
+                    const code = char.charCodeAt(0);
+                    if ((code >= 65) && (code <= 90))
+                        return String.fromCharCode(((code - 65 - SHIFT + 26) % 26) + 65);
+                    if ((code >= 97) && (code <= 122))
+                        return String.fromCharCode(((code - 97 - SHIFT + 26) % 26) + 97);
+                }
+                return char;
+            }).join('');
+        }
+
+        function processText(action) {
+            const input = document.getElementById('input').value;
+            const resultElement = document.getElementById('result');
+            const errorElement = document.getElementById('error');
+
+            if (input.trim() === '') {
+                showError(`Please enter some text to ${action}.`);
+                return;
+            }
+
+            try {
+                let result;
+                if (action === 'encrypt') {
+                    result = btoa(customEncrypt(input));
+                } else {
+                    result = customDecrypt(atob(input));
+                }
+                showResult(result);
+            } catch (error) {
+                showError('Invalid input format. Please enter valid text.');
+            }
+        }
+
+        function showResult(text) {
+            const resultElement = document.getElementById('result');
+            const errorElement = document.getElementById('error');
+
+            resultElement.textContent = text;
+            resultElement.classList.add('show');
+            errorElement.classList.remove('show');
+        }
+
+        function showError(message) {
+            const resultElement = document.getElementById('result');
+            const errorElement = document.getElementById('error');
+
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+            resultElement.classList.remove('show');
+        }
+
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            const particleCount = 40;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 3 + 1;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight;
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                particle.style.animation = `float ${duration}s ${delay}s infinite linear`;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        const floatKeyframes = `
+            @keyframes float {
+                0% { transform: translate(0, 0); }
+                25% { transform: translate(5px, 5px); }
+                50% { transform: translate(0, 10px); }
+                75% { transform: translate(-5px, 5px); }
+                100% { transform: translate(0, 0); }
+            }
+        `;
+
+        const styleElement = document.createElement('style');
+        styleElement.textContent = floatKeyframes;
+        document.head.appendChild(styleElement);
+
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('mousemove', (e) => {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                button.style.setProperty('--x', `${x}px`);
+                button.style.setProperty('--y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>

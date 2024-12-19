@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - CheckmateBegins</title>
+    <meta name="description" content="Terms and Conditions for using CheckmateBegins tools and resources.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://begins.site/terms-and-conditions.html">
+    <meta property="og:title" content="Terms and Conditions - CheckmateBegins">
+    <meta property="og:description" content="Read our Terms and Conditions for using CheckmateBegins tools and resources.">
+    <meta property="og:image" content="https://begins.site/images/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://begins.site/terms-and-conditions.html">
+    <meta property="twitter:title" content="Terms and Conditions - CheckmateBegins">
+    <meta property="twitter:description" content="Understand our Terms and Conditions for using CheckmateBegins tools and resources.">
+    <meta property="twitter:image" content="https://begins.site/images/twitter-image.jpg">
+
+    <!-- SEO Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="keywords" content="terms and conditions, CheckmateBegins, cybersecurity tools, legal">
+    <meta name="author" content="CheckmateBegins">
+    <meta name="copyright" content="© 2024 CheckmateBegins">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #333333;
+            --highlight-color: #4a4a4a;
+            --transition-duration: 0.3s;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            height: 80px;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-color);
+            transform: translateX(-100%);
+            transition: transform var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        .logo:hover::after {
+            transform: translateX(0);
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links li {
+            margin-left: 2rem;
+        }
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 5px 0;
+        }
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-links a:hover {
+            color: #cccccc;
+        }
+        .nav-links a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: transform var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+        }
+        main {
+            padding-top: 80px;
+        }
+        .terms-section {
+            padding: 6rem 0;
+            position: relative;
+            z-index: 1;
+            background-color: var(--bg-color);
+        }
+        .terms-content {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .terms-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        h1, h2 {
+            margin-bottom: 1rem;
+        }
+        p {
+            margin-bottom: 1rem;
+        }
+        ul {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        footer {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 2rem 0;
+        }
+        @media screen and (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                padding: 1rem 0;
+                transform: translateY(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .nav-links.active {
+                display: flex;
+                transform: translateY(0);
+            }
+            .nav-links li {
+                margin: 1rem 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .button, .nav-links a {
+                -webkit-tap-highlight-color: transparent;
+            }
+            .button:active, .nav-links a:active {
+                background-color: var(--highlight-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="https://begins.site" class="logo">CheckmateBegins</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="/blog">Blogs</a></li>
+                <li><a href="visitorip.html">Your IP</a></li>
+                <li><a href="EncryptDecrypt.html">Encrypt</a></li>
+            </ul>
+            <div class="menu-toggle">☰</div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="terms" class="terms-section">
+            <div class="container">
+                <div class="terms-content">
+                    <h1>Terms and Conditions</h1>
+                    <p>Welcome to CheckmateBegins. By accessing and using our website and tools, you agree to comply with and be bound by the following terms and conditions:</p>
+
+                    <h2>1. Use of Tools and Resources</h2>
+                    <p>The tools and resources provided by Begins.site and CheckmateBegins are for educational and informational purposes only. You agree to use these tools responsibly and in compliance with all applicable laws and regulations.</p>
+
+                    <h2>2. Intellectual Property</h2>
+                    <p>All content, tools, and resources available on Begins.site and CheckmateBegins are copyrighted and owned by CheckmateBegins, unless explicitly stated otherwise. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+
+                    <h2>3. Disclaimer of Warranty</h2>
+                    <p>The tools and resources are provided "as is" without any warranties, expressed or implied. CheckmateBegins does not warrant that the website or any of its contents will be error-free or uninterrupted.</p>
+
+                    <h2>4. Limitation of Liability</h2>
+                    <p>CheckmateBegins shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your access to, or use of, the website and its tools.</p>
+
+                    <h2>5. User Contributions</h2>
+                    <p>Any content you submit to our website (e.g., comments, feedback) becomes the property of CheckmateBegins and may be used, modified, or distributed without compensation to you.</p>
+
+                    <h2>6. Third-Party Content</h2>
+                    <p>While we strive to provide original content, if any material from the internet is found on our website without proper attribution, it should be considered uncopyrighted. However, this does not grant permission to reproduce such content elsewhere without proper authorization.</p>
+
+                    <h2>7. Modifications to Terms</h2>
+                    <p>CheckmateBegins reserves the right to modify these terms at any time without prior notice. Your continued use of the website constitutes acceptance of any changes to these terms.</p>
+
+                    <h2>8. Governing Law</h2>
+                    <p>These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction where CheckmateBegins is established.</p>
+
+                    <p>By using our website and tools, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our website or tools.</p>
+
+                    <p>Last updated: May 2024</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 CheckmateBegins. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            const termsContent = document.querySelector('.terms-content');
+
+            let lastScrollTop = 0;
+            let animationTriggered = false;
+
+            function animateContent() {
+                if (!animationTriggered) {
+                    termsContent.classList.add('visible');
+                    animationTriggered = true;
+                }
+            }
+
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // Smooth header background change
+                header.style.backgroundColor = `rgba(0, 0, 0, ${Math.min(0.8 + scrollTop / 300, 0.95)})`;
+                header.style.boxShadow = scrollTop > 50 ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none';
+
+                // Hide/show header based on scroll direction
+                if (scrollTop > lastScrollTop && scrollTop > 80) {
+                    header.style.transform = 'translateY(-100%)';
+                } else {
+                    header.style.transform = 'translateY(0)';
+                }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+
+                // Trigger content animation as soon as scrolling starts
+                if (scrollTop > 0) {
+                    animateContent();
+                }
+            });
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+            });
+
+            // Animate terms content on load
+            setTimeout(animateContent, 100);
+
+            // Trigger animations if user refreshes the page and is already scrolled down
+            if (window.pageYOffset > 0) {
+                animateContent();
+            }
+        });
+    </script>
+</body>
+</html>

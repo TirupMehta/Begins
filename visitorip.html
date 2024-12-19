@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheckmateBegins - Visitor IP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000000;
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 1s ease-out;
+            max-width: 100%;
+            width: min(400px, 90vw);
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #333333, #666666);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ip-address {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            margin: 1rem 0;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+            word-break: break-all;
+        }
+
+        .copy-btn, .home-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            color: #000000;
+            background: linear-gradient(45deg, #cccccc, #ffffff);
+            border: none;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1s forwards;
+            margin: 0.5rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .copy-btn:hover, .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-btn:active, .home-btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333333;
+            color: rgb(255, 255, 255);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+            font-size: clamp(0.75rem, 2vw, 0.875rem);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .copyright {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: clamp(0.625rem, 1.5vw, 0.75rem);
+            opacity: 0.7;
+        }
+
+        @media (max-height: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                margin-bottom: 0.75rem;
+            }
+
+            .ip-address {
+                margin: 0.75rem 0;
+            }
+
+            .copy-btn, .home-btn {
+                margin: 0.75rem 0;
+            }
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <h1>CheckmateBegins</h1>
+        <div class="ip-address" id="ipAddress">Fetching IP address...</div>
+        <div class="button-container">
+            <button class="copy-btn" onclick="copyToClipboard()">Copy IP Address</button>
+            <a href="https://begins.site" class="home-btn">Go to Homepage</a>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">IP address copied to clipboard!</div>
+
+    <div class="copyright"><a href="https://begins.site" style="color: #ffffff;">© CheckmateBegins</a></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        // Particles.js configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+                size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 0.1, sync: false } },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+            },
+            retina_detect: true
+        });
+
+        // Fetch IP address and save visitor info
+        async function fetchIpAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                document.getElementById('ipAddress').textContent = data.ip;
+                saveVisitorInfo(data.ip);
+            } catch (error) {
+                console.error("Failed to fetch IP address:", error);
+                document.getElementById('ipAddress').textContent = "Failed to fetch IP address";
+            }
+        }
+
+        // Save visitor info
+        async function saveVisitorInfo(ip) {
+            try {
+                const response = await fetch('save_visitor.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `ip=${encodeURIComponent(ip)}`
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to save visitor information');
+                }
+            } catch (error) {
+                console.error("Failed to save visitor information:", error);
+            }
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard() {
+            const ipAddress = document.getElementById('ipAddress').textContent;
+            navigator.clipboard.writeText(ipAddress).then(() => {
+                showToast();
+            });
+        }
+
+        // Show toast notification
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        fetchIpAddress();
+    </script>
+</body>
+</html>

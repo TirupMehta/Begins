@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="Enigma Begins" />
+    <meta name="description" content="A challenging maze of logic and encryption, where every twist and turn brings you closer to mastering the art of hacking." />
+
+    <title>Enigma Begins</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --background: #ffffff;
+            --text: #000000;
+            --error: #ff0000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 40rem;
+            background: var(--background);
+            border: 2px solid var(--text);
+            border-radius: 0.5rem;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--text);
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            color: var(--text);
+            background-color: var(--background);
+        }
+
+        button {
+            background-color: var(--text);
+            color: var(--background);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #level-indicator {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        #feedback {
+            margin-top: 1rem;
+            font-weight: 600;
+            min-height: 1.5rem;
+            text-align: center;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background-color: var(--background);
+            border: 1px solid var(--text);
+            margin-bottom: 1rem;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        #progress {
+            height: 100%;
+            background-color: var(--text);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        #achievement {
+            display: none;
+            border: 2px solid var(--text);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        #share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .share-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--text);
+            border-radius: 0.25rem;
+            background-color: var(--background);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        #timer {
+            text-align: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        #hint-button {
+            margin-top: 1rem;
+            background-color: var(--background);
+            color: var(--text);
+            border: 1px solid var(--text);
+        }
+
+        #hint {
+            margin-top: 1rem;
+            font-style: italic;
+            text-align: center;
+        }
+
+        #stats {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            #game-container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen" class="screen active">
+            <h1>Hacker's Logic Labyrinth</h1>
+            <p>Welcome, elite hacker. Navigate through 69 levels of increasingly complex challenges. Test your logical prowess and problem-solving skills. Are you ready to begin?</p>
+            <button id="start-button">Initiate Sequence</button>
+        </div>
+        
+        <div id="game-screen" class="screen">
+            <div id="level-indicator"></div>
+            <div id="progress-bar"><div id="progress"></div></div>
+            <div id="timer">Time: 00:00</div>
+            <h2 id="challenge"></h2>
+            <input type="text" id="answer-input" placeholder="Enter your solution">
+            <button id="submit-button">Submit</button>
+            <button id="hint-button">Get Hint</button>
+            <div id="hint"></div>
+            <div id="feedback"></div>
+            <div id="achievement">
+                <h3>Achievement Unlocked!</h3>
+                <p id="achievement-text"></p>
+                <div id="share-buttons">
+                    <button class="share-button twitter" onclick="shareAchievement('twitter')">Share on X</button>
+                    <button class="share-button linkedin" onclick="shareAchievement('linkedin')">Share on LinkedIn</button>
+                    <button class="share-button instagram" onclick="shareAchievement('instagram')">Share on Instagram</button>
+                </div>
+            </div>
+            <div id="stats">
+                <p>Correct Answers: <span id="correct-count">0</span></p>
+                <p>Incorrect Attempts: <span id="incorrect-count">0</span></p>
+            </div>
+        </div>
+        
+        <div id="win-screen" class="screen">
+            <h1>Mission Accomplished</h1>
+            <p>Congratulations, elite hacker! You've successfully navigated all 69 levels of the Logic Labyrinth. Your problem-solving skills are truly exceptional.</p>
+            <div id="final-stats"></div>
+            <button id="restart-button">Reinitiate Sequence</button>
+        </div>
+    </div>
+
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const winScreen = document.getElementById('win-screen');
+        const startButton = document.getElementById('start-button');
+        const submitButton = document.getElementById('submit-button');
+        const restartButton = document.getElementById('restart-button');
+        const answerInput = document.getElementById('answer-input');
+        const challengeElement = document.getElementById('challenge');
+        const feedbackElement = document.getElementById('feedback');
+        const levelIndicator = document.getElementById('level-indicator');
+        const progressBar = document.getElementById('progress');
+        const achievementElement = document.getElementById('achievement');
+        const achievementText = document.getElementById('achievement-text');
+        const timerElement = document.getElementById('timer');
+        const hintButton = document.getElementById('hint-button');
+        const hintElement = document.getElementById('hint');
+        const correctCountElement = document.getElementById('correct-count');
+        const incorrectCountElement = document.getElementById('incorrect-count');
+        const finalStatsElement = document.getElementById('final-stats');
+
+        const levels = [
+            { challenge: "What is the binary representation of the decimal number 42?", answer: "101010", hint: "Convert 42 to base 2" },
+            { challenge: "What port number is typically used for HTTPS?", answer: "443", hint: "Secure version of HTTP" },
+            { challenge: "What is the output of this Python code: print(2 ** 3 ** 2)", answer: "512", hint: "Remember the order of operations" },
+            { challenge: "What is the name of the attack that exploits buffer overflows?", answer: "Buffer Overflow", hint: "Overwriting adjacent memory locations" },
+            { challenge: "What is the hexadecimal representation of the RGB color (255, 0, 128)?", answer: "#FF0080", hint: "Convert each value to two-digit hex" },
+            { challenge: "What is the result of the bitwise operation: 1010 XOR 1100?", answer: "0110", hint: "XOR returns 1 if bits are different" },
+            { challenge: "What is the name of the encryption algorithm used in WPA2?", answer: "AES", hint: "Advanced Encryption Standard" },
+            { challenge: "What is the time complexity of quicksort in the average case?", answer: "O(n log n)", hint: "Divide and conquer algorithm" },
+            { challenge: "What is the default subnet mask for a Class C IP address?", answer: "255.255.255.0", hint: "24-bit network portion" },
+            { challenge: "What is the output of this bash command: echo $((2#1010))", answer: "10", hint: "2# prefix indicates binary" },
+            { challenge: "What is the name of the attack that exploits race conditions in file systems?", answer: "TOCTOU" },
+            { challenge: "What is the maximum number of IP addresses in a /24 subnet?", answer: "256" },
+            { challenge: "What is the result of this SQL query: SELECT COUNT(*) FROM (SELECT 1 UNION SELECT 2);", answer: "2" },
+            { challenge: "What is the name of the protocol used for secure shell connections?", answer: "SSH" },
+            { challenge: "What is the output of this JavaScript code: console.log(typeof NaN)", answer: "number" },
+            { challenge: "What is the name of the attack that exploits XML parsing vulnerabilities?", answer: "XXE" },
+            { challenge: "What is the result of this regular expression: /a{2,4}/.test('aaa')", answer: "true" },
+            { challenge: "What is the name of the principle that states 'every program and every privileged user of the system should operate using the least set of privileges necessary to complete the job'?", answer: "Principle of Least Privilege" },
+            { challenge: "What is the output of this C code: printf(\"%d\", 5 & 3);", answer: "1" },
+            { challenge: "What is the name of the attack that exploits improper input validation in SQL queries?", answer: "SQL Injection" },
+            { challenge: "What is the result of this bitwise operation: 0xFF << 4", answer: "0xFF0" },
+            { challenge: "What is the name of the protocol used for converting domain names to IP addresses?", answer: "DNS" },
+            { challenge: "What is the output of this Python code: print(len(set([1,2,2,3,3,3])))", answer: "3" },
+            { challenge: "What is the name of the attack that exploits the trust a web application has in a user's browser?", answer: "CSRF" },
+            { challenge: "What is the result of this bash command: echo 'Hello' | sed 's/l/L/g' | rev", answer: "oLLeH" },
+            { challenge: "What is the name of the vulnerability that allows an attacker to execute code by manipulating serialized objects?", answer: "Insecure Deserialization" },
+            { challenge: "What is the output of this JavaScript code: console.log(0.1 + 0.2 === 0.3)", answer: "false" },
+            { challenge: "What is the name of the attack that exploits weaknesses in DNS cache?", answer: "DNS Cache Poisoning" },
+            { challenge: "What is the time complexity of binary search?", answer: "O(log n)" },
+            { challenge: "What is the result of this Python code: print(sorted([3,1,4,1,5,9,2,6,5,3,5])[-3:])", answer: "[5, 6, 9]" },
+            { challenge: "What is the name of the principle that states 'security through obscurity' is not a reliable method?", answer: "Kerckhoffs's principle" },
+            { challenge: "What is the output of this bash command: echo {1..5} | tr ' ' '+'", answer: "1+2+3+4+5" },
+            { challenge: "What is the name of the attack that exploits the way browsers handle Unicode characters?", answer: "IDN Homograph Attack" },
+            { challenge: "What is the result of this bitwise operation: 15 & 9", answer: "9" },
+            { challenge: "What is the name of the protocol used for sending emails?", answer: "SMTP" },
+            { challenge: "What is the output of this JavaScript code: console.log([1, 2, 3] + [4, 5, 6])", answer: "1,2,34,5,6" },
+            { challenge: "What is the name of the attack that exploits the trust between interconnected systems?", answer: "Island Hopping" },
+            { challenge: "What is the result of this Python code: print(sum(map(int, '123')))", answer: "6" },
+            { challenge: "What is the name of the principle that states 'a system should be secure even if everything about it, except the key, is public knowledge'?", answer: "Shannon's maxim" },
+            { challenge: "You got free bonus question! just write 'Begin' to continue.", answer: "Begin" },
+            { challenge: "What is the name of the attack that exploits the difference in interpretation between two systems?", answer: "Type Confusion" },
+            { challenge: "What is the result of this SQL query: SELECT COALESCE(NULL, NULL, 'third', 'fourth');", answer: "third" },
+            { challenge: "What is the name of the protocol used for securely transferring files?", answer: "SFTP" },
+            { challenge: "What is the output of this JavaScript code: console.log(2 + '2' - 1)", answer: "21" },
+            { challenge: "What is the name of the attack that exploits the trust in legitimate software updates?", answer: "Supply Chain Attack" },
+            { challenge: "What is the result of this Python code: print(int('1' * 64, 2))", answer: "18446744073709551615" },
+            { challenge: "What is the name of the principle that states 'security measures should not be overly annoying or burdensome'?", answer: "Principle of Least Astonishment" },
+            { challenge: "What is the output of this bash command: echo 'hello' | od -An -tx1 | tr -d ' '", answer: "68656c6c6f0a" },
+            { challenge: "What is the name of the attack that exploits the shared physical infrastructure in cloud environments?", answer: "Side-Channel Attack" },
+            { challenge: "What is the result of this bitwise operation: ~0 << 1", answer: "-2" },
+            { challenge: "What is the name of the protocol used for real-time communication on the web?", answer: "WebSocket" },
+            { challenge: "What is the output of this JavaScript code: console.log(parseFloat('12.34.56'))", answer: "12.34" },
+            { challenge: "What is the name of the attack that exploits the trust in digital certificates?", answer: "SSL Stripping" },
+            { challenge: "What is the result of this Python code: print(chr(ord('A') ^ ord(' ')))", answer: "a" },
+            { challenge: "What is the name of the principle that states 'it should be easy to do the right (secure) thing and hard to do the wrong (insecure) thing'?", answer: "Principle of Secure Defaults" },
+            { challenge: "What is the output of this bash command: echo 'password' | openssl dgst -sha256 -binary | base64", answer: "XohImNooBHFR0OVvjcYpJ3NgXohImNooBHFR0OVvjcYpJ3NgpxeKzgTpAH3Bzc=" },
+            { challenge: "What is the name of the attack that exploits the way memory is allocated and deallocated?", answer: "Use-After-Free" },
+            { challenge: "What is the result of this SQL query: SELECT CAST('100' AS UNSIGNED) | 1;", answer: "101" },
+            { challenge: "What is the name of the protocol used for accessing network file systems?", answer: "NFS" },
+            { challenge: "What is the output of this JavaScript code: console.log(Math.max() > Math.min())", answer: "false" },
+            { challenge: "What is the SHA-256 hash of the string 'password123' (in hexadecimal)?", answer: "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", hint: "Use an online SHA-256 calculator" },
+            { challenge: "What is the name of the cryptographic attack that exploits the birthday paradox?", answer: "Birthday Attack", hint: "Probability of two people sharing a birthday" },
+            { challenge: "What is the output of this Python code: print(sum(map(int, str(2**1000))))", answer: "1366", hint: "Calculate 2^1000, then sum its digits" },
+            { challenge: "What is the name of the principle that states 'a cryptographic system should be secure even if everything about the system, except the key, is public knowledge'?", answer: "Kerckhoffs's principle", hint: "Named after a 19th-century cryptographer" },
+            { challenge: "What is the result of this bash command: echo 'Hack the planet!' | xxd -p | xxd -p -r", answer: "Hack the planet!", hint: "xxd converts to hex and back" },
+            { challenge: "What is the name of the attack that exploits the mathematical properties of elliptic curve cryptography?", answer: "Invalid Curve Attack", hint: "Involves using points not on the defined curve" },
+            { challenge: "What is the output of this JavaScript code: console.log(Object.is(NaN, NaN), NaN === NaN)", answer: "true false", hint: "Object.is behaves differently than ===" },
+            { challenge: "What is the name of the vulnerability that allows an attacker to execute arbitrary code by manipulating the format string in printf-like functions?", answer: "Format String Vulnerability", hint: "Involves misuse of format specifiers" },
+            { challenge: "What is the result of this Python code: print(eval('__import__(\"os\").system(\"echo Hacked!\")'))", answer: "Hacked!\n0", hint: "eval executes the string as Python code" }
+        ];
+
+        let currentLevel = 0;
+        let startTime;
+        let timerInterval;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        function showScreen(screen) {
+            startScreen.classList.remove('active');
+            gameScreen.classList.remove('active');
+            winScreen.classList.remove('active');
+            screen.classList.add('active');
+        }
+
+        function startGame() {
+            currentLevel = parseInt(localStorage.getItem('currentLevel')) || 0;
+            correctCount = parseInt(localStorage.getItem('correctCount')) || 0;
+            incorrectCount = parseInt(localStorage.getItem('incorrectCount')) || 0;
+            updateStats();
+            showLevel();
+            showScreen(gameScreen);
+            startTimer();
+        }
+
+        function showLevel() {
+            challengeElement.textContent = levels[currentLevel].challenge;
+            levelIndicator.textContent = `Level ${currentLevel + 1} of ${levels.length}`;
+            answerInput.value = '';
+            feedbackElement.textContent = '';
+            hintElement.textContent = '';
+            updateProgressBar();
+            achievementElement.style.display = 'none';
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentLevel + 1) / levels.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = levels[currentLevel].answer.toLowerCase();
+
+            if (userAnswer === correctAnswer) {
+                feedbackElement.textContent = "Correct! Advancing to the next level...";
+                feedbackElement.style.color = 'var(--text)';
+                currentLevel++;
+                correctCount++;
+                localStorage.setItem('currentLevel', currentLevel);
+                localStorage.setItem('correctCount', correctCount);
+
+                if (currentLevel % 10 === 0 && currentLevel < levels.length) {
+                    showAchievement();
+                }
+
+                if (currentLevel >= levels.length) {
+                    endGame();
+                } else {
+                    setTimeout(showLevel, 1500);
+                }
+            } else {
+                feedbackElement.textContent = "Incorrect. Try again, hacker.";
+                feedbackElement.style.color = 'var(--error)';
+                incorrectCount++;
+                localStorage.setItem('incorrectCount', incorrectCount);
+            }
+            updateStats();
+        }
+
+        function showAchievement() {
+            const achievementLevel = Math.floor(currentLevel / 10) * 10;
+            achievementText.textContent = `You've completed ${achievementLevel} levels! Keep hacking!`;
+            achievementElement.style.display = 'block';
+        }
+
+        function shareAchievement(platform) {
+            const achievementLevel = Math.floor(currentLevel / 10) * 10;
+            const message = `I've completed ${achievementLevel} levels in Hacker's Logic Labyrinth! Can you beat my score? Play now at [Your Website URL]`;
+            let url;
+
+            switch (platform) {
+                case 'twitter':
+                    url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+                    break;
+                case 'linkedin':
+                    url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('[Your Website URL]')}&summary=${encodeURIComponent(message)}`;
+                    break;
+                case 'instagram':
+                    // Instagram doesn't have a direct sharing API, so we'll just copy the message to clipboard
+                    navigator.clipboard.writeText(message).then(() => {
+                        alert('Achievement copied to clipboard! Share it on Instagram.');
+                    });
+                    return;
+            }
+
+            window.open(url, '_blank');
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+            const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+            timerElement.textContent = `Time: ${minutes}:${seconds}`;
+        }
+
+        function showHint() {
+            hintElement.textContent = levels[currentLevel].hint;
+        }
+
+        function updateStats() {
+            correctCountElement.textContent = correctCount;
+            incorrectCountElement.textContent = incorrectCount;
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            showScreen(winScreen);
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            finalStatsElement.innerHTML = `
+                <p>Total Time: ${minutes} minutes ${seconds} seconds</p>
+                <p>Correct Answers: ${correctCount}</p>
+                <p>Incorrect Attempts: ${incorrectCount}</p>
+            `;
+        }
+
+        startButton.addEventListener('click', startGame);
+        submitButton.addEventListener('click', checkAnswer);
+        restartButton.addEventListener('click', startGame);
+        hintButton.addEventListener('click', showHint);
+
+        answerInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Load saved progress on page load
+        window.addEventListener('load', () => {
+            const savedLevel = localStorage.getItem('currentLevel');
+            if (savedLevel) {
+                startGame();
+            }
+        });
+    </script>
+</body>
+</html>

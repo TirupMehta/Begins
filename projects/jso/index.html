@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Effortlessly transform HTML into structured JSO data with CheckmateBegins HTML-to-JSO generator.">
+  <link rel="icon" type="image/png" href="../title.png">
+  <title>Begin JSO-Gen</title>
+  <script src="https://begins.site/projects/jso/script.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            neonPurple: "#a855f7",
+            neonBlue: "#3b82f6",
+            darkGray: "#0f172a",
+            lightGray: "#94a3b8",
+          },
+          boxShadow: {
+            glow: "0 0 15px rgba(168, 85, 247, 0.8)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Keyframes for fading and sliding animation */
+    @keyframes fadeInSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Animation for the output box */
+    .show {
+      animation: fadeInSlide 0.6s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-darkGray text-lightGray min-h-screen flex items-center justify-center font-sans">
+
+  <!-- Main Container -->
+  <div class="relative bg-gradient-to-br from-darkGray to-black border border-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-4xl space-y-10 transform hover:scale-105 transition-all duration-500">
+    <!-- Decorative Floating Orb -->
+    <div class="absolute top-0 right-0 w-32 h-32 rounded-full bg-gradient-to-r from-neonPurple via-neonBlue to-indigo-500 opacity-20 blur-3xl animate-float"></div>
+
+    <!-- Header Section -->
+    <div class="text-center">
+      <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-neonPurple via-neonBlue to-cyan-400">
+        JSO Generator
+      </h1>
+      <p class="text-gray-400 mt-4">
+        Encode your HTML into secure JavaScript with cutting-edge technology.
+      </p>
+    </div>
+
+    <!-- Input Section -->
+    <div>
+      <label for="htmlCode" class="block text-lg font-semibold text-gray-300 mb-2">
+        Enter Your HTML Code
+      </label>
+      <textarea 
+        id="htmlCode" 
+        rows="6" 
+        class="w-full bg-gray-900 text-lightGray p-4 rounded-lg border-2 border-gray-800 focus:ring-4 focus:ring-neonPurple shadow-md resize-none transition"
+        placeholder="<html>...</html>"></textarea>
+    </div>
+
+    <!-- Generate Button -->
+    <div class="flex justify-center">
+      <button
+        onclick="generateScript()" 
+        class="px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-neonPurple to-neonBlue rounded-lg shadow-glow hover:shadow-xl hover:scale-110 transform transition">
+        Generate
+      </button>
+    </div>
+
+    <!-- Output Section (Initially Hidden) -->
+    <div id="outputContainer" class="hidden">
+      <h2 class="text-lg font-semibold text-gray-300 mb-2">
+        Generated Script:
+      </h2>
+      <textarea 
+        id="generatedScript" 
+        rows="4" 
+        class="w-full bg-gray-900 text-green-400 p-4 rounded-lg border-2 border-gray-800 focus:ring-4 focus:ring-green-500 shadow-inner resize-none transition"
+        readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    async function generateScript() {
+      const htmlCode = document.getElementById('htmlCode').value;
+
+      if (!htmlCode.trim()) {
+        alert("Please enter some HTML code!");
+        return;
+      }
+
+      try {
+        const response = await fetch('generate.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ htmlCode }),
+        });
+
+        const data = await response.json();
+
+        if (data.generatedScript) {
+          document.getElementById('generatedScript').value = data.generatedScript;
+
+          // Make output container visible with animation
+          const outputContainer = document.getElementById('outputContainer');
+          outputContainer.classList.remove('hidden');
+          outputContainer.classList.add('show');
+        } else {
+          alert("An error occurred while generating the script.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to connect to the server.");
+      }
+    }
+  </script>
+</body>
+</html>

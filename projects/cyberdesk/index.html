@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberDesk</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            overflow: hidden;
+        }
+        #game-container {
+            display: flex;
+            height: 100%;
+        }
+        #main-terminal {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-right: 1px solid #0f0;
+        }
+        #side-panel {
+            width: 300px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .terminal-line {
+            margin-bottom: 5px;
+        }
+        #input-line {
+            display: flex;
+            margin-top: 10px;
+        }
+        #prompt {
+            margin-right: 5px;
+        }
+        #input {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            outline: none;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+        .info { color: #0ff; }
+        #network-map, #file-system, #target-info {
+            margin-top: 20px;
+            border: 1px solid #0f0;
+            padding: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #003300;
+            margin-top: 5px;
+        }
+        .progress {
+            width: 0%;
+            height: 20px;
+            background-color: #0f0;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="main-terminal"></div>
+        <div id="side-panel">
+            <div id="network-map">Network Map</div>
+            <div id="file-system">File System</div>
+            <div id="target-info">Target Info</div>
+        </div>
+    </div>
+    <div id="input-line">
+        <span id="prompt">hacker@cyberdesk:~$</span>
+        <input type="text" id="input" autofocus>
+    </div>
+
+    <script>
+        const mainTerminal = document.getElementById('main-terminal');
+        const input = document.getElementById('input');
+        const prompt = document.getElementById('prompt');
+        const networkMap = document.getElementById('network-map');
+        const fileSystem = document.getElementById('file-system');
+        const targetInfo = document.getElementById('target-info');
+
+        let currentSystem = 'local';
+        let discoveredSystems = ['local'];
+        let exploitedSystems = [];
+        let currentDir = '/home/hacker';
+        let missionProgress = 0;
+
+        const systems = {
+            'local': { name: 'Local System', ip: '127.0.0.1', os: 'Kali Linux', difficulty: 0 },
+            'router': { name: 'Gateway Router', ip: '192.168.1.1', os: 'RouterOS', difficulty: 1 },
+            'webserver': { name: 'Web Server', ip: '203.0.113.10', os: 'Ubuntu 20.04', difficulty: 2 },
+            'fileserver': { name: 'File Server', ip: '203.0.113.20', os: 'Windows Server 2019', difficulty: 3 },
+            'mainframe': { name: 'Corporate Mainframe', ip: '198.51.100.5', os: 'IBM z/OS', difficulty: 5 }
+        };
+
+        const tools = {
+            'nmap': { name: 'Nmap', description: 'Network scanning tool' },
+            'metasploit': { name: 'Metasploit', description: 'Exploitation framework' },
+            'hydra': { name: 'Hydra', description: 'Password cracking tool' },
+            'wireshark': { name: 'Wireshark', description: 'Network protocol analyzer' },
+            'sqlmap': { name: 'SQLMap', description: 'SQL injection tool' },
+            'john': { name: 'John the Ripper', description: 'Password cracker' },
+            'aircrack-ng': { name: 'Aircrack-ng', description: 'Wireless security tool' },
+            'hashcat': { name: 'Hashcat', description: 'Advanced password recovery' },
+        };
+
+        const fileStructure = {
+            '/home/hacker': ['documents', 'tools', 'loot'],
+            '/home/hacker/documents': ['mission_briefing.txt', 'contacts.enc'],
+            '/home/hacker/tools': Object.keys(tools),
+            '/home/hacker/loot': [],
+            '/': ['home', 'etc', 'var'],
+            '/etc': ['passwd', 'shadow'],
+            '/var': ['log', 'www'],
+            '/var/log': ['auth.log', 'syslog'],
+            '/var/www': ['html']
+        };
+
+        function log(message, className = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${className}`;
+            line.innerHTML = message;
+            mainTerminal.appendChild(line);
+            mainTerminal.scrollTop = mainTerminal.scrollHeight;
+        }
+
+        function setPrompt(newPrompt) {
+            prompt.textContent = newPrompt;
+        }
+
+        function updateNetworkMap() {
+            networkMap.innerHTML = '<h3>Network Map</h3>';
+            for (const [key, system] of Object.entries(systems)) {
+                if (discoveredSystems.includes(key)) {
+                    const systemElement = document.createElement('div');
+                    systemElement.textContent = `${system.name} (${system.ip})`;
+                    systemElement.style.color = exploitedSystems.includes(key) ? '#0f0' : '#fff';
+                    networkMap.appendChild(systemElement);
+                }
+            }
+        }
+
+        function updateFileSystem() {
+            fileSystem.innerHTML = '<h3>File System</h3>';
+            const currentFiles = fileStructure[currentDir] || [];
+            currentFiles.forEach(file => {
+                const fileElement = document.createElement('div');
+                fileElement.textContent = file;
+                fileSystem.appendChild(fileElement);
+            });
+        }
+
+        function updateTargetInfo() {
+            const system = systems[currentSystem];
+            targetInfo.innerHTML = `
+                <h3>Target Info</h3>
+                <p>Name: ${system.name}</p>
+                <p>IP: ${system.ip}</p>
+                <p>OS: ${system.os}</p>
+                <p>Difficulty: ${'★'.repeat(system.difficulty)}</p>
+            `;
+        }
+
+        function executeCommand(command) {
+            log(`<span class="info">${prompt.textContent}</span> ${command}`);
+            const args = command.split(' ');
+            const cmd = args[0].toLowerCase();
+
+            switch(cmd) {
+                case 'help':
+                    showHelp();
+                    break;
+                case 'scan':
+                case 'nmap':
+                    scanNetwork(args[1]);
+                    break;
+                case 'exploit':
+                case 'metasploit':
+                    exploitSystem(args[1]);
+                    break;
+                case 'brute':
+                case 'hydra':
+                    bruteForce(args[1]);
+                    break;
+                case 'sqlinject':
+                case 'sqlmap':
+                    sqlInject(args[1]);
+                    break;
+                case 'crack':
+                case 'john':
+                    crackPassword(args[1]);
+                    break;
+                case 'connect':
+                    connectToSystem(args[1]);
+                    break;
+                case 'ls':
+                    listFiles();
+                    break;
+                case 'cd':
+                    changeDirectory(args[1]);
+                    break;
+                case 'cat':
+                    readFile(args[1]);
+                    break;
+                case 'wget':
+                    downloadFile(args[1]);
+                    break;
+                case 'mission':
+                    showMissionProgress();
+                    break;
+                default:
+                    log('Unknown command. Type "help" for available commands.', 'error');
+            }
+
+            updateNetworkMap();
+            updateFileSystem();
+            updateTargetInfo();
+        }
+
+        function showHelp() {
+            log('Available commands:', 'info');
+            log('  help - Show this help message', 'info');
+            log('  scan/nmap [ip] - Scan network or specific IP', 'info');
+            log('  exploit/metasploit [ip] - Attempt to exploit a system', 'info');
+            log('  brute/hydra [ip] - Attempt a brute force attack', 'info');
+            log('  sqlinject/sqlmap [ip] - Attempt SQL injection', 'info');
+            log('  crack/john [file] - Attempt to crack passwords', 'info');
+            log('  connect [ip] - Connect to a system', 'info');
+            log('  ls - List files in current directory', 'info');
+            log('  cd [dir] - Change directory', 'info');
+            log('  cat [file] - Read file contents', 'info');
+            log('  wget [file] - Download a file', 'info');
+            log('  mission - Show mission progress', 'info');
+        }
+
+        function scanNetwork(target) {
+            log(`Scanning ${target || 'network'}...`);
+            simulateProgress(() => {
+                if (!target) {
+                    Object.keys(systems).forEach(sys => {
+                        if (!discoveredSystems.includes(sys)) {
+                            discoveredSystems.push(sys);
+                        }
+                    });
+                    log('Network scan complete. New systems discovered.', 'success');
+                } else {
+                    const system = Object.values(systems).find(s => s.ip === target);
+                    if (system) {
+                        log(`System found: ${system.name} (${system.os})`, 'success');
+                        if (!discoveredSystems.includes(system.name.toLowerCase())) {
+                            discoveredSystems.push(system.name.toLowerCase());
+                        }
+                    } else {
+                        log(`No system found with IP ${target}`, 'error');
+                    }
+                }
+                missionProgress += 10;
+            });
+        }
+
+        function exploitSystem(target) {
+            if (!target) {
+                log('Usage: exploit [ip]', 'error');
+                return;
+            }
+            const system = Object.values(systems).find(s => s.ip === target);
+            if (!system) {
+                log(`No system found with IP ${target}`, 'error');
+                return;
+            }
+            log(`Attempting to exploit ${system.name}...`);
+            simulateProgress(() => {
+                const success = Math.random() < (1 - system.difficulty * 0.1);
+                if (success) {
+                    log(`Successfully exploited ${system.name}!`, 'success');
+                    if (!exploitedSystems.includes(system.name.toLowerCase())) {
+                        exploitedSystems.push(system.name.toLowerCase());
+                    }
+                    missionProgress += 20;
+                } else {
+                    log(`Failed to exploit ${system.name}. Try a different approach.`, 'error');
+                }
+            });
+        }
+
+        function bruteForce(target) {
+            if (!target) {
+                log('Usage: brute [ip]', 'error');
+                return;
+            }
+            log(`Initiating brute force attack on ${target}...`);
+            simulateProgress(() => {
+                const success = Math.random() < 0.3;
+                if (success) {
+                    log(`Brute force attack successful! Password found: ${'*'.repeat(12)}`, 'success');
+                    missionProgress += 15;
+                } else {
+                    log('Brute force attack failed. The password is too strong.', 'error');
+                }
+            });
+        }
+
+        function sqlInject(target) {
+            if (!target) {
+                log('Usage: sqlinject [ip]', 'error');
+                return;
+            }
+            log(`Attempting SQL injection on ${target}...`);
+            simulateProgress(() => {
+                const success = Math.random() < 0.4;
+                if (success) {
+                    log('SQL injection successful! Database compromised.', 'success');
+                    missionProgress += 25;
+                } else {
+                    log('SQL injection failed. The target might be using prepared statements.', 'error');
+                }
+            });
+        }
+
+        function crackPassword(file) {
+            if (!file) {
+                log('Usage: crack [file]', 'error');
+                return;
+            }
+            log(`Attempting to crack passwords in ${file}...`);
+            simulateProgress(() => {
+                const success = Math.random() < 0.5;
+                if (success) {
+                    log('Password cracking successful! Some passwords recovered.', 'success');
+                    missionProgress += 15;
+                } else {
+                    log('Password cracking failed. The hashes might be too strong.', 'error');
+                }
+            });
+        }
+
+        function connectToSystem(target) {
+            if (!target) {
+                log('Usage: connect [ip]', 'error');
+                return;
+            }
+            const system = Object.values(systems).find(s => s.ip === target);
+            if (!system) {
+                log(`No system found with IP ${target}`, 'error');
+                return;
+            }
+            if (!exploitedSystems.includes(system.name.toLowerCase())) {
+                log(`Cannot connect to ${system.name}. You need to exploit it first.`, 'error');
+                return;
+            }
+            currentSystem = system.name.toLowerCase();
+            setPrompt(`hacker@${currentSystem}:~$`);
+            log(`Connected to ${system.name}`, 'success');
+            currentDir = '/';
+            updateFileSystem();
+        }
+
+        function listFiles() {
+            const files = fileStructure[currentDir] || [];
+            if (files.length === 0) {
+                log('No files in this directory.', 'info');
+            } else {
+                files.forEach(file => log(file, 'info'));
+            }
+        }
+
+        function changeDirectory(dir) {
+            if (!dir) {
+                log('Usage: cd [directory]', 'error');
+                return;
+            }
+            if (dir === '..') {
+                const currentDirParts = currentDir.split('/');
+                currentDirParts.pop();
+                currentDir = currentDirParts.join('/') || '/';
+            } else if (dir.startsWith('/')) {
+                currentDir = dir;
+            } else {
+                currentDir = `${currentDir}/${dir}`.replace('//', '/');
+            }
+            if (!fileStructure[currentDir]) {
+                log(`Directory not found: ${dir}`, 'error');
+                return;
+            }
+            setPrompt(`hacker@${currentSystem}:${currentDir}$`);
+            log(`Changed directory to ${currentDir}`, 'info');
+        }
+
+        function readFile(file) {
+            if (!file) {
+                log('Usage: cat [file]', 'error');
+                return;
+            }
+            const files = fileStructure[currentDir] || [];
+            if (!files.includes(file)) {
+                log(`File not found: ${file}`, 'error');
+                return;
+            }
+            log(`Contents of ${file}:`, 'info');
+            if (file === 'mission_briefing.txt') {
+                log('Your mission: Infiltrate the corporate mainframe and exfiltrate sensitive data.', 'info');
+            } else if (file === 'contacts.enc') {
+                log('This file is encrypted. Use the "crack" command to decrypt it.', 'info');
+            } else {
+                log('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'info');
+            }
+        }
+
+        function downloadFile(file) {
+            if (!file) {
+                log('Usage: wget [file]', 'error');
+                return;
+            }
+            const files = fileStructure[currentDir] || [];
+            if (!files.includes(file)) {
+                log(`File not found: ${file}`, 'error');
+                return;
+            }
+            log(`Downloading ${file}...`);
+            simulateProgress(() => {
+                log(`File ${file} downloaded successfully.`, 'success');
+                if (!fileStructure['/home/hacker/loot'].includes(file)) {
+                    fileStructure['/home/hacker/loot'].push(file);
+                }
+                missionProgress += 5;
+            });
+        }
+
+        function showMissionProgress() {
+            log(`Mission Progress: ${missionProgress}%`, 'info');
+            if (missionProgress >= 100) {
+                log('Congratulations! You have completed the mission!', 'success');
+            } else {
+                log('Continue hacking to complete the mission.', 'info');
+            }
+        }
+
+        function simulateProgress(callback) {
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            const progress = document.createElement('div');
+            progress.className = 'progress';
+            progressBar.appendChild(progress);
+            mainTerminal.appendChild(progressBar);
+
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    progressBar.remove();
+                    callback();
+                } else {
+                    width += Math.random() * 10;
+                    progress.style.width = `${Math.min(width, 100)}%`;
+                }
+            }, 100);
+        }
+
+        input.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                const command = input.value;
+                input.value = '';
+                executeCommand(command);
+            }
+        });
+
+        log('Welcome to Ultimate CyberHack Simulator', 'success');
+        log('Type "help" for available commands or "mission" for your objectives.', 'info');
+        updateNetworkMap();
+        updateFileSystem();
+        updateTargetInfo();
+    </script>
+</body>
+</html>

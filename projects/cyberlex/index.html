@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberLex: CheckmateBegins</title>
+    <meta name="keywords" content="CyberLex, Cybersecurity, Ethical Hacking, Cryptography, Network Security, Cybersecurity Topics, Learn Cybersecurity, CheckmateBegins, Begins.site">
+    <meta name="author" content="CheckmateBegins">
+    <meta property="og:title" content="CyberLex - Learn Cybersecurity Topics | CheckmateBegins">
+    <meta property="og:description" content="Explore in-depth cybersecurity topics at CyberLex by CheckmateBegins. Get insights on ethical hacking, cryptography, network security, and more.">
+    <meta property="og:url" content="https://begins.site">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #3949ab;
+            --accent-color: #00bcd4;
+            --text-color: #333;
+            --background-color: #f5f7fa;
+            --card-background: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: black;
+            text-align: center;
+            padding: 1.6rem 0;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #search-container {
+            display: flex;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 50px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        #search-container:focus-within {
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #search-input {
+            flex-grow: 1;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px 0 0 50px;
+            transition: background-color 0.3s ease;
+        }
+
+        #search-input:focus {
+            outline: none;
+            background-color: #e8f0fe;
+        }
+
+        #search-button {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        #search-button:hover {
+            background-color: #00acc1;
+        }
+
+        #search-button:active {
+            transform: scale(0.98);
+        }
+
+        #features {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .feature-button {
+            flex: 1;
+            padding: 1rem;
+            font-size: 1rem;
+            background-color: var(--card-background);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-button:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        #result {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        #result.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #result h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 2rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #result p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        #related-terms {
+            margin-top: 2rem;
+        }
+
+        #related-terms h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        #related-terms ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        #related-terms li {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        #related-terms li:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 2rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .copyright a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .copyright a:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            #features {
+                flex-direction: column;
+            }
+
+            .feature-button {
+                width: 100%;
+            }
+        }
+
+        /* Dark mode styles */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #3f51b5;
+                --secondary-color: #5c6bc0;
+                --accent-color: #00bcd4;
+                --text-color: #e0e0e0;
+                --background-color: #121212;
+                --card-background: #1e1e1e;
+            }
+
+            body {
+                color: var(--text-color);
+            }
+
+            #search-input {
+                background-color: #2c2c2c;
+                color: var(--text-color);
+            }
+
+            #search-input:focus {
+                background-color: #3c3c3c;
+            }
+
+            .feature-button {
+                background-color: var(--card-background);
+                color: var(--accent-color);
+            }
+
+            .feature-button:hover {
+                background-color: var(--accent-color);
+                color: var(--card-background);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CyberLex</h1>
+        <p class="subtitle">Your Ultimate Guide to Cybersecurity: Explore, Learn, and Stay Secure</p>
+    </header>
+    <div class="container">
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Search for cybersecurity terms, concepts, or technologies..." aria-label="Search for cybersecurity terms">
+            <button id="search-button">Search</button>
+        </div>
+        <div id="features">
+            <button class="feature-button" id="random-term">Discover Random Term</button>
+            <button class="feature-button" id="daily-tip">Cybersecurity Tip of the Day</button>
+            <button class="feature-button" id="quiz">Test Your Knowledge</button>
+        </div>
+        <div id="categories">
+            <!-- Categories will be dynamically populated here -->
+        </div>
+        <div id="result" class="hidden">
+            <h2 id="term"></h2>
+            <p id="definition"></p>
+            <div id="related-terms">
+                <h3>Related Terms:</h3>
+                <ul id="related-terms-list"></ul>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p class="copyright">&copy; 2023 CheckmateBegins. All rights reserved. | <a href="https://begins.site" target="_blank" rel="noopener noreferrer">https://begins.site</a></p>
+    </footer>
+
+    <script>
+        const dictionary = {
+            "phishing": {
+                definition: "A cyberattack that uses fraudulent emails or websites to trick users into revealing sensitive information such as passwords or credit card numbers.",
+                category: "Attack Types",
+                related: ["social engineering", "spear phishing", "whaling"]
+            },
+            "ransomware": {
+                definition: "A type of malicious software designed to block access to a computer system until a sum of money is paid.",
+                category: "Malware",
+                related: ["malware", "cryptolocker", "wannacry"]
+            },
+            "ddos": {
+                definition: "Distributed Denial of Service - An attack where multiple compromised systems are used to target a single system, causing a denial of service for users of the targeted resource.",
+                category: "Attack Types",
+                related: ["botnet", "traffic analysis", "syn flood"]
+            },
+            "firewall": {
+                definition: "A network security system that monitors and controls incoming and outgoing network traffic based on predetermined security rules.",
+                category: "Security Tools",
+                related: ["network security", "packet filtering", "proxy server"]
+            },
+            "malware": {
+                definition: "Short for 'malicious software', any software intentionally designed to cause damage to a computer, server, client, or computer network.",
+                category: "Threats",
+                related: ["virus", "trojan", "spyware"]
+            },
+            "encryption": {
+                definition: "The process of converting information or data into a code, especially to prevent unauthorized access.",
+                category: "Security Concepts",
+                related: ["cryptography", "public key", "private key"]
+            },
+            "vpn": {
+                definition: "Virtual Private Network - A service that allows users to create a secure, encrypted connection to another network over the Internet.",
+                category: "Security Tools",
+                related: ["encryption", "tunneling", "remote access"]
+            },
+            "two-factor authentication": {
+                definition: "An extra layer of security used to ensure that people trying to gain access to an online account are who they say they are.",
+                category: "Security Concepts",
+                related: ["multi-factor authentication", "password", "biometrics"]
+            },
+            "social engineering": {
+                definition: "The psychological manipulation of people into performing actions or divulging confidential information.",
+                category: "Attack Types",
+                related: ["phishing", "pretexting", "baiting"]
+            },
+            "zero-day exploit": {
+                definition: "An attack that exploits a previously unknown vulnerability in a computer application, meaning that the attack occurs on 'day zero' of awareness of the vulnerability.",
+                category: "Vulnerabilities",
+                related: ["vulnerability", "patch", "exploit"]
+            },
+            "penetration testing": {
+                definition: "A simulated cyberattack against your computer system to check for exploitable vulnerabilities.",
+                category: "Security Practices",
+                related: ["ethical hacking", "vulnerability assessment", "red team"]
+            },
+            "sql injection": {
+                definition: "A code injection technique used to attack data-driven applications, in which malicious SQL statements are inserted into an entry field for execution.",
+                category: "Attack Types",
+                related: ["input validation", "prepared statements", "database security"]
+            },
+            "man-in-the-middle attack": {
+                definition: "An attack where the attacker secretly relays and possibly alters the communications between two parties who believe they are directly communicating with each other.",
+                category: "Attack Types",
+                related: ["eavesdropping", "session hijacking", "ssl stripping"]
+            },
+            "biometrics": {
+                definition: "The measurement and statistical analysis of people's unique physical and behavioral characteristics, used for authentication purposes.",
+                category: "Security Concepts",
+                related: ["fingerprint recognition", "facial recognition", "two-factor authentication"]
+            },
+            "blockchain": {
+                definition: "A decentralized, distributed ledger technology that records the provenance of a digital asset.",
+                category: "Security Technologies",
+                related: ["cryptocurrency", "smart contracts", "decentralization"]
+            }, 
+            "trojan horse": {
+                definition: "A type of malware that disguises itself as a legitimate file or program to trick users into installing it.",
+                category: "Malware",
+                related: ["malware", "virus", "spyware"]
+            },
+            "spyware": {
+                definition: "Software that secretly monitors and collects information about users' activities without their knowledge.",
+                category: "Malware",
+                related: ["adware", "keylogger", "malware"]
+            },
+            "keylogger": {
+                definition: "A type of surveillance technology used to monitor and record each keystroke typed on a specific computer's keyboard.",
+                category: "Malware",
+                related: ["spyware", "data theft", "rootkit"]
+            },
+            "adware": {
+                definition: "Software that automatically displays or downloads advertising material when a user is online.",
+                category: "Malware",
+                related: ["spyware", "malware", "pop-up"]
+            },
+            "rootkit": {
+                definition: "A collection of malicious software tools that allow an unauthorized user to gain control of a computer system without being detected.",
+                category: "Malware",
+                related: ["malware", "backdoor", "trojan horse"]
+            },
+            "backdoor": {
+                definition: "A method of bypassing normal authentication procedures to gain unauthorized access to a system.",
+                category: "Attack Techniques",
+                related: ["rootkit", "trojan horse", "security breach"]
+            },
+            "exploit": {
+                definition: "A piece of software, data, or sequence of commands that takes advantage of a bug or vulnerability to cause unintended or unanticipated   behavior in software.",
+                category: "Vulnerabilities",
+                related: ["zero-day exploit", "patch", "vulnerability"]
+            },
+            "brute force attack": {
+                definition: "An attack method used to obtain information such as a password or PIN by systematically trying all possible combinations of characters until the correct one is found.",
+                category: "Attack Techniques",
+                related: ["password cracking", "dictionary attack", "cyber attack"]
+            },
+            "dictionary attack": {
+                definition: "An attack method used to break a password or PIN by systematically entering every word in a dictionary as a password.",
+                category: "Attack Techniques",
+                related: ["brute force attack", "password cracking", "cyber attack"]
+            },
+            "session hijacking": {
+                definition: "An attack in which a user session is taken over by an attacker. It's often achieved by stealing the session token.",
+                category: "Attack Techniques",
+                related: ["man-in-the-middle attack", "eavesdropping", "cyber attack"]
+            },
+            "honeypot": {
+                definition: "A security mechanism that creates a decoy system to attract cyber attackers and gather information about their activities.",
+                category: "Security Tools",
+                related: ["intrusion detection system", "firewall", "cyber security"]
+            },
+            "intrusion detection system": {
+                definition: "A device or software application that monitors a network or systems for malicious activity or policy violations.",
+                category: "Security Tools",
+                related: ["firewall", "honeypot", "network monitoring"]
+            },
+            "buffer overflow": {
+                definition: "An anomaly where a program, while writing data to a buffer, overruns the buffer's boundary and overwrites adjacent memory.",
+                category: "Attack Techniques",
+                related: ["exploit", "vulnerability", "code injection"]
+            },
+            "cross-site scripting (XSS)": {
+                definition: "A security vulnerability typically found in web applications, where attackers inject malicious scripts into content from otherwise trusted websites.",
+                category: "Attack Types",
+                related: ["input validation", "web security", "script injection"]
+            },
+            "cryptojacking": {
+                definition: "The unauthorized use of someone else's computer to mine cryptocurrency.",
+                category: "Attack Techniques",
+                related: ["cryptocurrency", "malware", "cyber attack"]
+            },
+            "data breach": {
+                definition: "An incident where information is stolen or taken from a system without the knowledge or authorization of the system's owner.",
+                category: "Security Incidents",
+                related: ["cyber attack", "information theft", "phishing"]
+            },
+            "drive-by download": {
+                definition: "A download that happens without a person's knowledge or consent, typically when they visit a compromised website.",
+                category: "Attack Techniques",
+                related: ["malware", "exploit", "phishing"]
+            },
+            "exploit kit": {
+                definition: "A toolkit used to exploit security holes found in software applications for malicious purposes.",
+                category: "Attack Techniques",
+                related: ["exploit", "malware", "cyber attack"]
+            },
+            "insider threat": {
+                definition: "A security risk that originates from within the targeted organization, often from employees, former employees, contractors, or business associates.",
+                category: "Security Risks",
+                related: ["data breach", "cyber security", "information theft"]
+            },
+            "man-in-the-browser": {
+                definition: "A form of man-in-the-middle attack where the attacker infects a web browser and modifies transactions as they occur, usually with banking transactions.",
+                category: "Attack Techniques",
+                related: ["man-in-the-middle attack", "malware", "cyber attack"]
+            },
+            "patch management": {
+                definition: "The process of distributing and applying updates to software to fix vulnerabilities and improve security.",
+                category: "Security Practices",
+                related: ["vulnerability management", "security update", "software maintenance"]
+            },
+            "watering hole attack": {
+                definition: "A security exploit in which the attacker seeks to compromise a specific group of end users by infecting websites that members of the group are known to visit.",
+                category: "Attack Techniques",
+                related: ["exploit", "malware", "cyber attack"]
+            },
+            "whaling": {
+                definition: "A type of phishing attack that targets high-profile individuals such as executives or other important figures within a company.",
+                category: "Attack Techniques",
+                related: ["phishing", "social engineering", "spear phishing"]
+            }
+        };
+
+        const categories = [...new Set(Object.values(dictionary).map(item => item.category))];
+
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const result = document.getElementById('result');
+        const termElement = document.getElementById('term');
+        const definitionElement = document.getElementById('definition');
+        const relatedTermsList = document.getElementById('related-terms-list');
+        const randomTermButton = document.getElementById('random-term');
+        const dailyTipButton = document.getElementById('daily-tip');
+        const quizButton = document.getElementById('quiz');
+        const categoriesContainer = document.getElementById('categories');
+
+        function search() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const matchedTerms = Object.keys(dictionary).filter(term => 
+                term.includes(searchTerm) || 
+                dictionary[term].definition.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchedTerms.length > 0) {
+                displayTerm(matchedTerms[0]);
+            } else {
+                result.classList.add('hidden');
+                alert('Term not found. Please try another cybersecurity term.');
+            }
+        }
+
+        function displayTerm(term) {
+            const { definition, related } = dictionary[term];
+            termElement.textContent = term.charAt(0).toUpperCase() + term.slice(1);
+            definitionElement.textContent = definition;
+            result.classList.remove('hidden');
+            result.classList.remove('visible');
+            setTimeout(() => {
+                result.classList.add('visible');
+            }, 10);
+
+            relatedTermsList.innerHTML = '';
+            related.forEach(relatedTerm => {
+                const li = document.createElement('li');
+                li.textContent = relatedTerm;
+                li.addEventListener('click', () => {
+                    searchInput.value = relatedTerm;
+                    search();
+                });
+                relatedTermsList.appendChild(li);
+            });
+        }
+
+        function getRandomTerm() {
+            const terms = Object.keys(dictionary);
+            const randomTerm = terms[Math.floor(Math.random() * terms.length)];
+            searchInput.value = randomTerm;
+            displayTerm(randomTerm);
+        }
+
+        function showDailyTip() {
+            const tips = [
+                "Always use strong, unique passwords for each of your accounts.",
+                "Enable two-factor authentication whenever possible.",
+                "Keep your software and operating systems up to date.",
+                "Be cautious when clicking on links or downloading attachments from unknown sources.",
+                "Regularly back up your important data to an external drive or cloud storage.",
+                "Use a VPN when connecting to public Wi-Fi networks.",
+                "Be wary of phishing attempts in emails, texts, or phone calls.",
+                "Install and maintain reputable antivirus software on your devices.",
+                "Use encryption for sensitive data and communications.",
+                "Educate yourself and stay informed about the latest cybersecurity threats and best practices.",
+                "Avoid using public Wi-Fi for sensitive transactions.",
+                "Use complex passwords that include a mix of letters, numbers, and symbols.",
+                "Regularly change your passwords.",
+                "Do not share your passwords with anyone.",
+                "Monitor your financial accounts regularly for any suspicious activity.",
+                "Enable account alerts to stay informed about your account activities.",
+                "Clear your browsing history and cookies regularly.",
+                "Use a password manager to store and manage your passwords securely.",
+                "Limit the personal information you share on social media.",
+                "Disable automatic connection to public Wi-Fi networks.",
+                "Be cautious about downloading software from unfamiliar websites.",
+                "Use a firewall to protect your network.",
+                "Ensure your devices are protected with strong security settings.",
+                "Avoid clicking on pop-up ads or alerts from unknown sources.",
+                "Secure your home Wi-Fi network with a strong password.",
+                "Turn off Bluetooth when not in use.",
+                "Be aware of the security settings on your social media accounts.",
+                "Use secure, encrypted websites for online shopping.",
+                "Report suspicious emails or messages to your IT department.",
+                "Do not reuse passwords across multiple sites.",
+                "Disable unused ports and services on your devices.",
+                "Keep your devices' firmware updated.",
+                "Use biometric authentication where available.",
+                "Be cautious about the information you provide over the phone.",
+                "Regularly review your app permissions.",
+                "Shred sensitive documents before disposing of them.",
+                "Implement security measures on all IoT devices.",
+                "Be aware of physical security risks, such as unattended devices.",
+                "Participate in cybersecurity awareness training.",
+                "Ensure your data is encrypted both at rest and in transit."
+            ];
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            alert("Cybersecurity Tip of the Day:\n\n" + randomTip);
+        }
+
+        function startQuiz() {
+            const terms = Object.keys(dictionary);
+            const quizTerm = terms[Math.floor(Math.random() * terms.length)];
+            const correctAnswer = dictionary[quizTerm].definition;
+            const wrongAnswers = terms.filter(t => t !== quizTerm).map(t => dictionary[t].definition).sort(() => 0.5 - Math.random()).slice(0, 3);
+            const answers = [correctAnswer, ...wrongAnswers].sort(() => 0.5 - Math.random());
+
+            const userAnswer = prompt(`What is the definition of "${quizTerm}"?\n\n${answers.map((a, i) => `${i + 1}. ${a}`).join('\n')}\n\nEnter the number of your answer:`);
+
+            if (userAnswer && answers[parseInt(userAnswer) - 1] === correctAnswer) {
+                alert("Correct! Well done!");
+            } else {
+                alert(`Sorry, that's incorrect. The correct definition of "${quizTerm}" is:\n\n${correctAnswer}`);
+            }
+        }
+
+        function populateCategories() {
+            categories.forEach(category => {
+                const categoryElement = document.createElement('div');
+                categoryElement.classList.add('category');
+                categoryElement.textContent = category;
+                categoryElement.addEventListener('click', () => {
+                    const termsInCategory = Object.keys(dictionary).filter(term => dictionary[term].category === category);
+                    const randomTerm = termsInCategory[Math.floor(Math.random() * termsInCategory.length)];
+                    searchInput.value = randomTerm;
+                    displayTerm(randomTerm);
+                });
+                categoriesContainer.appendChild(categoryElement);
+            });
+        }
+
+        searchButton.addEventListener('click', search);
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+        randomTermButton.addEventListener('click', getRandomTerm);
+        dailyTipButton.addEventListener('click', showDailyTip);
+        quizButton.addEventListener('click', startQuiz);
+
+        populateCategories();
+    </script>
+</body>
+</html>

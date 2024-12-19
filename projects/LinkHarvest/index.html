@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LinkHarvest - Extract and analyze website links efficiently. A powerful tool for web developers and SEO specialists.">
+    <meta name="keywords" content="link extractor, website analysis, SEO tools, web development">
+    <meta name="author" content="Begins.site">
+    <meta property="og:title" content="LinkHarvest - Website Link Extraction Tool">
+    <meta property="og:description" content="Extract and analyze website links efficiently with LinkHarvest.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>LinkHarvest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0070f3;
+            --secondary: #00a3bf;
+            --background: #fafafa;
+            --text: #171717;
+            --card: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @property --gradient-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        @keyframes gradient-rotation {
+            0% { --gradient-angle: 0deg; }
+            100% { --gradient-angle: 360deg; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(0, 112, 243, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(0, 163, 191, 0.05) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            flex-grow: 1;
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: var(--card);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+        }
+
+        button:hover {
+            background-color: #0060df;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #result {
+            display: none;
+        }
+
+        #links-list {
+            list-style-type: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        #links-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #links-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #links-list::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+
+        #links-list li {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        #links-list a {
+            color: var(--primary);
+            text-decoration: none;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            display: none;
+            position: relative;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from var(--gradient-angle), var(--primary), transparent);
+            animation: gradient-rotation 2s linear infinite;
+        }
+
+        .loader::after {
+            background: var(--background);
+            transform: scale(0.8);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.75rem;
+            background-color: rgba(0, 112, 243, 0.05);
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        footer {
+            background-color: var(--card);
+            color: var(--text);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .stat-item {
+                padding: 0.5rem;
+            }
+            .stat-value {
+                font-size: 1.25rem;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--text);
+            color: var(--card);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LinkHarvest</h1>
+        <div class="card">
+            <input type="text" id="url-input" placeholder="https://example.com" autocomplete="off" spellcheck="false">
+            <button id="extract-btn">Extract Links</button>
+        </div>
+        <div class="loader" id="loader"></div>
+        <div id="result" class="card">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-links">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="internal-links">0</div>
+                    <div class="stat-label">Internal</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="external-links">0</div>
+                    <div class="stat-label">External</div>
+                </div>
+            </div>
+            <ul id="links-list"></ul>
+        </div>
+    </div>
+    <footer>
+        &copy; 2023 LinkHarvest by Begins.site. All rights reserved.
+    </footer>
+
+    <script>
+        const urlInput = document.getElementById('url-input');
+        const extractBtn = document.getElementById('extract-btn');
+        const linksList = document.getElementById('links-list');
+        const loader = document.getElementById('loader');
+        const result = document.getElementById('result');
+        const totalLinksEl = document.getElementById('total-links');
+        const internalLinksEl = document.getElementById('internal-links');
+        const externalLinksEl = document.getElementById('external-links');
+
+        let allLinks = [];
+
+        extractBtn.addEventListener('click', extractLinks);
+
+        async function extractLinks() {
+            const url = urlInput.value.trim();
+            if (!url) {
+                showNotification('Please enter a valid URL');
+                return;
+            }
+
+            showLoader(true);
+            clearResults();
+
+            try {
+                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+                const response = await fetch(proxyUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const html = data.contents;
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const links = doc.getElementsByTagName('a');
+                allLinks = [];
+
+                for (let link of links) {
+                    const href = link.getAttribute('href');
+                    if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                        try {
+                            const fullUrl = new URL(href, url).href;
+                            const isInternal = fullUrl.startsWith(url);
+                            allLinks.push({ url: fullUrl, isInternal });
+                        } catch (e) {
+                            console.error('Invalid URL:', href);
+                        }
+                    }
+                }
+
+                displayLinks(allLinks);
+                updateStats();
+
+                if (allLinks.length === 0) {
+                    showNotification('No links found on the specified page');
+                }
+            } catch (error) {
+                showNotification(`Error: ${error.message}`);
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function displayLinks(links) {
+            linksList.innerHTML = '';
+            links.forEach(link => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.textContent = link.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                li.appendChild(a);
+                linksList.appendChild(li);
+            });
+            result.style.display = 'block';
+        }
+
+        function updateStats() {
+            const total = allLinks.length;
+            const internal = allLinks.filter(link => link.isInternal).length;
+            const external = total - internal;
+
+            animateValue(totalLinksEl, 0, total, 1000);
+            animateValue(internalLinksEl, 0, internal, 1000);
+            animateValue(externalLinksEl, 0, external, 1000);
+        }
+
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function clearResults() {
+            linksList.innerHTML = '';
+            result.style.display = 'none';
+        }
+
+        function showLoader(show) {
+            loader.style.display = show ? 'block' : 'none';
+            extractBtn.disabled = show;
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.className = 'notification';
+            document.body.appendChild(notification);
+
+            // Trigger reflow
+            notification.offsetHeight;
+
+            // Fade in
+            notification.style.opacity = '1';
+
+            // Fade out and remove after delay
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

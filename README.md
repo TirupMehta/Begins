@@ -34,7 +34,7 @@ Visit the website: [https://begins.site](https://begins.site)
 ## 📂 **Project Structure**
 
 ```plaintext
-.
+
 ├── index.html           # Homepage of the website
 ├── assets/              # Images, styles, and scripts
 ├── blog/                # Directory for Blogs

@@ -1,6 +1,8 @@
 # CheckmateBegins
 
-![CheckmateBegins](https://i.ibb.co/G0g5zXG/3.png)
+<p align="center">
+  <img src="https://i.ibb.co/G0g5zXG/3.png" alt="CheckmateBegins">
+</p>
 
 Welcome to the **CheckmateBegins** repository! This is the source code for [CheckmateBegins](https://begins.site), an open-source platform featuring tools and projects designed to enhance your cybersecurity, AI, and development journey.
 

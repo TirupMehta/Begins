@@ -26,7 +26,6 @@ Visit the website: [https://begins.site](https://begins.site)
 5. **CyberDesk**: A hacking mission-based game.
 6. **Enigma Begins**: A hacker's logic labyrinth.
 7. **Text-to-Speech**: Convert text to audio with customizable options.
-8. **Live Streams**: Daily events streamed seamlessly via the platform.
 
 ---
 

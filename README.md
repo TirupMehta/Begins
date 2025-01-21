@@ -1,6 +1,6 @@
 # CheckmateBegins
 
-![CheckmateBegins]([https://ibb.co/nbhLxT4])
+![CheckmateBegins](https://ibb.co/nbhLxT4)
 
 Welcome to the **CheckmateBegins** repository! This is the source code for [CheckmateBegins](https://begins.site), an open-source platform featuring tools and projects designed to enhance your cybersecurity, AI, and development journey.
 

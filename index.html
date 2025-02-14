@@ -38,19 +38,8 @@
             color: var(--text-color);
             line-height: 1.6;
             overflow-x: hidden;
-            cursor: none; /* Hides the default cursor */
         }
-        
-        .custom-cursor {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: black;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-        }
-        
+
         .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 0 5%; }
         header {
             background-color: rgba(0, 0, 0, 0.8);
@@ -367,17 +356,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </footer>
 
     <script>
-
-const cursor = document.createElement("div");
-cursor.classList.add("custom-cursor");
-document.body.appendChild(cursor);
-
-document.addEventListener("mousemove", (e) => {
-  cursor.style.left = `${e.clientX}px`;
-  cursor.style.top = `${e.clientY}px`;
-});
-
-        
         document.addEventListener('DOMContentLoaded', () => {
             const header = document.querySelector('header');
             const menuToggle = document.querySelector('.menu-toggle');

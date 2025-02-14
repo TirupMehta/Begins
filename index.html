@@ -40,6 +40,17 @@
             overflow-x: hidden;
             cursor: none; /* Hides the default cursor */
         }
+        
+        .custom-cursor {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: black;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
         .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 0 5%; }
         header {
             background-color: rgba(0, 0, 0, 0.8);

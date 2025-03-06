@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GleanBox - Web Snippets, Redefined</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, #1f2a44 0%, #0d0d0d 100%);
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 15px;
+      background: linear-gradient(to right, #00aaff, #00e6ff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: #d0d0d0;
+      margin-bottom: 25px;
+    }
+
+    .cta a {
+      background: #00aaff;
+      color: #fff;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 170, 255, 0.3);
+    }
+
+    .cta a:hover {
+      background: #0088cc;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 170, 255, 0.5);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      display: grid;
+      gap: 40px;
+    }
+
+    .section h2 {
+      font-size: 28px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #e0e0e0;
+    }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    .feature-card {
+      background: #181818;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid #2a2a2a;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: #00aaff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: #a0a0a0;
+    }
+
+    /* How It Works */
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      background: #1f2a44;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+    }
+
+    .step h3 {
+      font-size: 16px;
+      color: #00aaff;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 13px;
+      color: #d0d0d0;
+    }
+
+    /* About */
+    .about {
+      text-align: center;
+    }
+
+    .about p {
+      font-size: 14px;
+      color: #b0b0b0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .about a {
+      color: #00aaff;
+      text-decoration: none;
+    }
+
+    .about a:hover {
+      text-decoration: underline;
+    }
+
+    /* MIT License */
+    .license {
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      padding: 15px;
+      background: #181818;
+      border-radius: 8px;
+      border: 1px solid #2a2a2a;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #777;
+      background: #0d0d0d;
+    }
+
+    footer a {
+      color: #00aaff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero { min-height: 40vh; }
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 16px; }
+      .features { grid-template-columns: 1fr; }
+      .steps { flex-direction: column; gap: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>GleanBox</h1>
+      <p>Redefine how you capture web snippets—simple, fast, yours.</p>
+      <div class="cta">
+        <a href="https://github.com/[Your GitHub Handle]/gleanbox" target="_blank">Get GleanBox</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Features -->
+    <section class="section">
+      <h2>Why GleanBox?</h2>
+      <div class="features">
+        <div class="feature-card">
+          <h3>Instant Capture</h3>
+          <p>Highlight and glean with a right-click.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Fast Retrieval</h3>
+          <p>Type "g [keyword]" to jump back.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Smart Tools</h3>
+          <p>Search and sort your way.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Always Synced</h3>
+          <p>Your snippets, everywhere Chrome is.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <h3>Glean</h3>
+          <p>Highlight text, right-click "Glean."</p>
+        </div>
+        <div class="step">
+          <h3>Manage</h3>
+          <p>Search or sort in one spot.</p>
+        </div>
+        <div class="step">
+          <h3>Retrieve</h3>
+          <p>Use "g [keyword]" anytime.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="section about">
+      <h2>About</h2>
+      <p>Built by [Your Name], a coder hooked on making the web work better. See more at <a href="https://github.com/[Your GitHub Handle]" target="_blank">GitHub</a>.</p>
+    </section>
+
+    <!-- MIT License -->
+    <div class="license">
+      <p><strong>MIT License</strong><br>Copyright (c) [Year] [Your Name]. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Created by [Your Name] | <a href="https://github.com/[Your GitHub Handle]/gleanbox">Source</a></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Vault</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            color: #2c3e50;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark {
+            background: #121212;
+            color: #dcdcdc;
+        }
+        .container {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            transition: background 0.3s;
+        }
+        body.dark .container {
+            background: #1e1e1e;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 3em;
+            color: #2980b9;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        body.dark .header h1 {
+            color: #3498db;
+        }
+        .header p {
+            font-size: 1.3em;
+            color: #7f8c8d;
+        }
+        body.dark .header p {
+            color: #bdc3c7;
+        }
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        body.dark .theme-toggle {
+            color: #dcdcdc;
+        }
+        .tab {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .tab button {
+            padding: 12px 25px;
+            font-size: 1.2em;
+            border: none;
+            background: #dfe4ea;
+            color: #2980b9;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        body.dark .tab button {
+            background: #2c2c2c;
+            color: #3498db;
+        }
+        .tab button.active {
+            background: #2980b9;
+            color: #fff;
+        }
+        body.dark .tab button.active {
+            background: #3498db;
+        }
+        .tab button:hover {
+            transform: translateY(-2px);
+        }
+        .form, .retrieve {
+            display: none;
+        }
+        .form.active, .retrieve.active {
+            display: block;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1.1em;
+            background: #f7f9fc;
+            color: #2c3e50;
+            transition: border 0.3s;
+        }
+        body.dark textarea, body.dark input[type="text"] {
+            background: #2c2c2c;
+            border-color: #444;
+            color: #dcdcdc;
+        }
+        textarea:focus, input[type="text"]:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+        textarea {
+            height: 200px;
+            resize: none;
+        }
+        button.submit, button.retrieve-btn {
+            width: 100%;
+            padding: 15px;
+            background: #2980b9;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        body.dark button.submit, body.dark button.retrieve-btn {
+            background: #3498db;
+        }
+        button.submit:hover, button.retrieve-btn:hover {
+            background: #20638f;
+            transform: translateY(-2px);
+        }
+        #result {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #2c3e50;
+            word-wrap: break-word;
+            padding: 15px;
+            border-radius: 10px;
+            background: #ecf0f1;
+        }
+        body.dark #result {
+            color: #dcdcdc;
+            background: #2c2c2c;
+        }
+        .id-display {
+            background: #dfe4ea;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #2980b9;
+            display: inline-block;
+        }
+        body.dark .id-display {
+            background: #3a3a3a;
+            color: #3498db;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            .header h1 {
+                font-size: 2.2em;
+            }
+            .tab button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Time Vault</h1>
+            <p>Seal your secrets. Reveal them in a month.</p>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+        <div class="tab">
+            <button class="tab-btn active" onclick="switchTab('write')">Write Note</button>
+            <button class="tab-btn" onclick="switchTab('retrieve')">Retrieve Note</button>
+        </div>
+        <div class="form active" id="write">
+            <textarea id="note" placeholder="Write your note here..."></textarea>
+            <button class="submit" onclick="saveNote()">Seal in Vault</button>
+        </div>
+        <div class="retrieve" id="retrieve">
+            <input type="text" id="noteId" placeholder="Enter your Note ID (or admin pass)">
+            <button class="retrieve-btn" onclick="retrieveNote()">Unlock Note</button>
+        </div>
+        <div id="result"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+
+        const GITHUB_TOKEN = "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";
+        const GITHUB_USER = "cbegins";
+        const GITHUB_REPO = "time-vault-data";
+        const FILE_PATH = "notes.json";
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+            localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+        }
+        if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.form, .retrieve').forEach(el => el.classList.remove('active'));
+            document.querySelector(`#${tab}`).classList.add('active');
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById("result").innerText = "";
+        }
+
+        function generateId() {
+            return 'TV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        async function getNotesFromGitHub() {
+            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+            const response = await fetch(url, {
+                headers: { "Authorization": `token ${GITHUB_TOKEN}` }
+            });
+            if (response.status === 404) return { notes: {}, sha: null };
+            if (!response.ok) throw new Error(`Fetch failed: ${response.status} ${response.statusText}`);
+            const data = await response.json();
+            const content = atob(data.content);
+            const lines = content.split('\n').filter(line => line);
+            const notes = {};
+            lines.forEach(line => {
+                const [id, json] = line.split(': ');
+                notes[id] = JSON.parse(json);
+            });
+            return { notes, sha: data.sha };
+        }
+
+        async function updateNotesOnGitHub(newNotes, sha) {
+            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+            const formattedNotes = Object.entries(newNotes)
+                .map(([id, data]) => `${id}: ${JSON.stringify(data)}`)
+                .join('\n');
+            const content = btoa(formattedNotes);
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${GITHUB_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: `Update notes - ${new Date().toISOString()}`,
+                    content: content,
+                    sha: sha
+                })
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(`Update failed: ${response.status} - ${error.message}`);
+            }
+            return true;
+        }
+
+        async function saveNote() {
+            let note = document.getElementById("note").value.trim();
+            if (!note) {
+                document.getElementById("result").innerText = "Write something, bro.";
+                return;
+            }
+            let timestamp = new Date().getTime();
+            let noteId = generateId();
+            let encrypted = CryptoJS.AES.encrypt(note, SECRET_KEY).toString();
+            let data = { timestamp: timestamp, note: encrypted };
+
+            try {
+                const { notes, sha } = await getNotesFromGitHub();
+                notes[noteId] = data;
+                const success = await updateNotesOnGitHub(notes, sha);
+                if (success) {
+                    document.getElementById("result").innerHTML = `Note sealed! Your ID: <span class="id-display">${noteId}</span><br>Save this ID and return in a month.`;
+                    document.getElementById("note").value = "";
+                }
+            } catch (e) {
+                document.getElementById("result").innerText = `Failed to save: ${e.message}. Check PAT, repo, or try again.`;
+            }
+        }
+
+        async function retrieveNote() {
+            let input = document.getElementById("noteId").value.trim();
+
+            if (input === ADMIN_PASS) {
+                try {
+                    const { notes } = await getNotesFromGitHub();
+                    let output = "All Notes:\n";
+                    for (let id in notes) {
+                        let decrypted = CryptoJS.AES.decrypt(notes[id].note, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+                        let date = new Date(notes[id].timestamp).toLocaleDateString();
+                        output += `${id} (${date}): "${decrypted}"\n`;
+                    }
+                    document.getElementById("result").innerText = output || "No notes yet.";
+                } catch (e) {
+                    document.getElementById("result").innerText = `Error fetching notes: ${e.message}`;
+                }
+                document.getElementById("noteId").value = "";
+                return;
+            }
+
+            try {
+                const { notes } = await getNotesFromGitHub();
+                const data = notes[input];
+                if (!data) {
+                    document.getElementById("result").innerText = "Invalid ID or note not found.";
+                    return;
+                }
+                let now = new Date().getTime();
+                let timeDiff = now - data.timestamp;
+
+                if (timeDiff >= ONE_MONTH_MS) {
+                    let decrypted = CryptoJS.AES.decrypt(data.note, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+                    document.getElementById("result").innerText = `Your note from a month ago: "${decrypted}"`;
+                } else {
+                    let daysLeft = Math.ceil((ONE_MONTH_MS - timeDiff) / (24 * 60 * 60 * 1000));
+                    document.getElementById("result").innerText = `Too early! Wait ${daysLeft} more days.`;
+                }
+            } catch (e) {
+                document.getElementById("result").innerText = `Error fetching note: ${e.message}`;
+            }
+            document.getElementById("noteId").value = "";
+        }
+    </script>
+</body>
+</html>

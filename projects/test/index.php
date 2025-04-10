@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: text/html; charset=UTF-8');
+
 // Handle file upload and cleanup
 $tempDir = __DIR__ . '/temp/';
 $uploadMessage = '';
@@ -11,7 +13,12 @@ if (!file_exists($tempDir)) {
 // Clean up expired files
 foreach (glob($tempDir . '*') as $file) {
     if (time() - filemtime($file) > 600) { // 10 minutes max
-        unlink($file);
+        if (is_dir($file)) {
+            array_map('unlink', glob("$file/*"));
+            rmdir($file);
+        } else {
+            unlink($file);
+        }
     }
 }
 
@@ -27,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['files'])) {
         }
     }
     
-    $shareLink = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]temp/$shareId/";
+    $shareLink = "http://$_SERVER[HTTP_HOST]/temp/$shareId/";
     $uploadMessage = 'Files uploaded successfully!';
 }
 ?>
@@ -352,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['files'])) {
         <?php if ($shareLink): ?>
             const timerElement = document.getElementById('timer');
             const copyButton = document.getElementById('copyButton');
-            let secondsLeft = expirationTime * 60;
+            let secondsLeft = <?php echo $expirationTime * 60; ?>;
 
             const timerInterval = setInterval(() => {
                 secondsLeft--;

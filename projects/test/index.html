@@ -1,3 +1,37 @@
+<?php
+// Handle file upload and cleanup
+$tempDir = __DIR__ . '/temp/';
+$uploadMessage = '';
+$shareLink = '';
+
+if (!file_exists($tempDir)) {
+    mkdir($tempDir, 0777, true);
+}
+
+// Clean up expired files
+foreach (glob($tempDir . '*') as $file) {
+    if (time() - filemtime($file) > 600) { // 10 minutes max
+        unlink($file);
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['files'])) {
+    $shareId = uniqid();
+    $tempFolder = $tempDir . $shareId;
+    mkdir($tempFolder);
+    
+    foreach ($_FILES['files']['tmp_name'] as $key => $tmpName) {
+        if ($_FILES['files']['error'][$key] === UPLOAD_ERR_OK) {
+            $fileName = basename($_FILES['files']['name'][$key]);
+            move_uploaded_file($tmpName, "$tempFolder/$fileName");
+        }
+    }
+    
+    $shareLink = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]temp/$shareId/";
+    $uploadMessage = 'Files uploaded successfully!';
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +53,6 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            overflow-x: hidden;
         }
 
         .container {
@@ -92,10 +125,6 @@
             margin-bottom: 15px;
         }
 
-        #fileInput {
-            display: none;
-        }
-
         .time-options {
             display: flex;
             gap: 15px;
@@ -162,7 +191,6 @@
             transition: all 0.3s ease;
             font-size: 1.1em;
             font-weight: 600;
-            display: none;
             width: 100%;
         }
 
@@ -178,7 +206,6 @@
             border-radius: 10px;
             color: #fff;
             word-break: break-all;
-            display: none;
             position: relative;
             z-index: 1;
         }
@@ -204,47 +231,59 @@
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
         }
+
+        .message {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>TempShare</h1>
         
-        <div class="drop-zone" id="dropZone">
-            <p>Drop folders/files here</p>
-            <p>or click to browse</p>
-        </div>
-
-        <div class="time-options">
-            <button class="time-btn" data-time="1">1 Minute</button>
-            <button class="time-btn" data-time="5">5 Minutes</button>
-            <button class="time-btn" data-time="10" data-default>10 Minutes</button>
-        </div>
-
-        <div class="file-list" id="fileList"></div>
-
-        <div class="share-section">
-            <button class="share-btn" id="shareButton">Generate Temporary Link</button>
-            <div class="share-link" id="shareLink">
-                <p id="linkText"></p>
-                <div class="timer" id="timer"></div>
-                <button class="copy-btn" id="copyButton">Copy Link</button>
+        <form id="uploadForm" enctype="multipart/form-data" method="post">
+            <div class="drop-zone" id="dropZone">
+                <p>Drop folders/files here</p>
+                <p>or click to browse</p>
+                <input type="file" name="files[]" id="fileInput" multiple webkitdirectory directory style="display: none;">
             </div>
-        </div>
+
+            <div class="time-options">
+                <button type="button" class="time-btn" data-time="1">1 Minute</button>
+                <button type="button" class="time-btn" data-time="5">5 Minutes</button>
+                <button type="button" class="time-btn active" data-time="10">10 Minutes</button>
+            </div>
+
+            <div class="file-list" id="fileList"></div>
+
+            <div class="share-section">
+                <?php if ($uploadMessage): ?>
+                    <p class="message"><?php echo $uploadMessage; ?></p>
+                <?php endif; ?>
+                <button type="submit" class="share-btn" id="shareButton" style="display: none;">Generate Temporary Link</button>
+                
+                <?php if ($shareLink): ?>
+                    <div class="share-link" id="shareLink" style="display: block;">
+                        <p id="linkText"><?php echo $shareLink; ?></p>
+                        <div class="timer" id="timer">Expires in: 10:00</div>
+                        <button type="button" class="copy-btn" id="copyButton">Copy Link</button>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </form>
     </div>
 
     <script>
         const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
         const shareButton = document.getElementById('shareButton');
-        const shareLink = document.getElementById('shareLink');
-        const linkText = document.getElementById('linkText');
-        const timerElement = document.getElementById('timer');
-        const copyButton = document.getElementById('copyButton');
         const timeButtons = document.querySelectorAll('.time-btn');
+        const form = document.getElementById('uploadForm');
         let selectedFiles = [];
         let expirationTime = 10; // Default 10 minutes
-        let timerInterval;
 
         // Drag and drop events
         ['dragover', 'dragenter'].forEach(event => {
@@ -263,16 +302,15 @@
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
+            fileInput.files = e.dataTransfer.files;
             handleFiles(e.dataTransfer.files);
         });
 
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
         dropZone.addEventListener('click', () => {
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.multiple = true;
-            fileInput.webkitdirectory = true;
-            fileInput.directory = true;
-            fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
             fileInput.click();
         });
 
@@ -282,7 +320,6 @@
                 btn.classList.add('active');
                 expirationTime = parseInt(btn.dataset.time);
             });
-            if (btn.dataset.default) btn.classList.add('active');
         });
 
         function handleFiles(files) {
@@ -312,11 +349,12 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function startTimer(minutes) {
-            clearInterval(timerInterval);
-            let secondsLeft = minutes * 60;
-            
-            timerInterval = setInterval(() => {
+        <?php if ($shareLink): ?>
+            const timerElement = document.getElementById('timer');
+            const copyButton = document.getElementById('copyButton');
+            let secondsLeft = expirationTime * 60;
+
+            const timerInterval = setInterval(() => {
                 secondsLeft--;
                 const mins = Math.floor(secondsLeft / 60);
                 const secs = secondsLeft % 60;
@@ -324,41 +362,20 @@
                 
                 if (secondsLeft <= 0) {
                     clearInterval(timerInterval);
-                    shareLink.style.display = 'none';
-                    selectedFiles = [];
-                    shareButton.style.display = 'none';
-                    fileList.innerHTML = '';
+                    document.getElementById('shareLink').style.display = 'none';
                     timerElement.textContent = 'Link expired';
                 }
             }, 1000);
-        }
 
-        shareButton.addEventListener('click', () => {
-            const shareId = Math.random().toString(36).substring(2, 15);
-            const tempLink = `https://begins.site/projects/test/temp/${shareId}`;
-            linkText.textContent = tempLink;
-            shareLink.style.display = 'block';
-            startTimer(expirationTime);
-            
-            // Store files in memory (simulated storage)
-            localStorage.setItem(shareId, JSON.stringify({
-                files: selectedFiles.map(f => ({
-                    name: f.name,
-                    path: f.webkitRelativePath,
-                    size: f.size
-                })),
-                expires: Date.now() + (expirationTime * 60 * 1000)
-            }));
-        });
-
-        copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(linkText.textContent)
-                .then(() => {
-                    copyButton.textContent = 'Copied!';
-                    setTimeout(() => copyButton.textContent = 'Copy Link', 2000);
-                })
-                .catch(err => console.error('Failed to copy:', err));
-        });
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(document.getElementById('linkText').textContent)
+                    .then(() => {
+                        copyButton.textContent = 'Copied!';
+                        setTimeout(() => copyButton.textContent = 'Copy Link', 2000);
+                    })
+                    .catch(err => console.error('Failed to copy:', err));
+            });
+        <?php endif; ?>
     </script>
 </body>
 </html>

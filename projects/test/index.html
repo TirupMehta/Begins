@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FolderShare - Simple File Sharing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .drop-zone:hover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .drop-zone p {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .share-btn {
+            background: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .share-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .share-link {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            word-break: break-all;
+            display: none;
+        }
+
+        .copy-btn {
+            background: #4CAF50;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FolderShare</h1>
+        
+        <div class="drop-zone" id="dropZone">
+            <p>Drag & Drop folders/files here</p>
+            <p>or</p>
+            <label for="fileInput" class="share-btn">Browse Files</label>
+            <input type="file" id="fileInput" multiple webkitdirectory directory>
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+
+        <button class="share-btn" id="shareButton" style="display: none; width: 100%;">Generate Share Link</button>
+        <div class="share-link" id="shareLink">
+            <p id="linkText"></p>
+            <button class="copy-btn" id="copyButton">Copy Link</button>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const shareButton = document.getElementById('shareButton');
+        const shareLink = document.getElementById('shareLink');
+        const linkText = document.getElementById('linkText');
+        const copyButton = document.getElementById('copyButton');
+        let selectedFiles = [];
+
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // File input event
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Click to open file picker
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            displayFiles();
+            shareButton.style.display = selectedFiles.length > 0 ? 'block' : 'none';
+        }
+
+        function displayFiles() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <span>${file.webkitRelativePath || file.name}</span>
+                    </div>
+                    <span>${formatFileSize(file.size)}</span>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        shareButton.addEventListener('click', async () => {
+            try {
+                // Simulate file upload and link generation
+                // In a real application, this would upload to a server
+                const formData = new FormData();
+                selectedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                // Simulated share link (replace with actual server endpoint)
+                const shareId = Math.random().toString(36).substring(2, 15);
+                const generatedLink = `${window.location.origin}/share/${shareId}`;
+                
+                linkText.textContent = generatedLink;
+                shareLink.style.display = 'block';
+            } catch (error) {
+                console.error('Error generating share link:', error);
+                linkText.textContent = 'Error generating share link';
+                shareLink.style.display = 'block';
+            }
+        });
+
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(linkText.textContent)
+                .then(() => {
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = 'Copy Link';
+                    }, 2000);
+                })
+                .catch(err => console.error('Failed to copy:', err));
+        });
+    </script>
+</body>
+</html>

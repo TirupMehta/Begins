@@ -129,7 +129,7 @@
           font-size: 15px;
           border: 2px solid rgb(255, 252, 252);
           border-radius: 0.8em;
-          box-shadow: 0.1em 0.3em;
+          box-shadow: 0.1em 0.1em;
           cursor: pointer;
         }
 
@@ -172,6 +172,49 @@
             transition: opacity 0.5s ease;
             z-index: 20;
         }
+
+        #mobile-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            font-family: Arial, sans-serif;
+        }
+
+        #mobile-popup-content {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 80%;
+            color: #fff;
+        }
+
+        #mobile-popup-content p {
+            margin: 0 0 20px;
+            font-size: 18px;
+        }
+
+        #close-popup {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #close-popup:hover {
+            background-color: #666;
+        }
+
     </style>
 </head>
 <body>
@@ -216,6 +259,13 @@
         
         <div id="level-transition">
             <div id="level-transition-text">LEVEL 1</div>
+        </div>
+    </div>
+
+    <div id="mobile-popup">
+        <div id="mobile-popup-content">
+            <p>This website is more compatible for desktop devices.</p>
+            <button id="close-popup">Close</button>
         </div>
     </div>
 
@@ -930,6 +980,19 @@
             totalGameTime = 0;
             showLevelTransition();
         });
+
+        function isMobile() {
+            return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        if (isMobile()) {
+            document.getElementById('mobile-popup').style.display = 'flex';
+        }
+
+        document.getElementById('close-popup').addEventListener('click', () => {
+            document.getElementById('mobile-popup').style.display = 'none';
+        });
+
     </script>
 </body>
 </html>

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraveRush</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+        }
+        
+        canvas {
+            background-color: #000;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            border: 2px solid #333;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 16px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .ui-item {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        
+        #level-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        
+        #timer {
+            position: absolute;
+            top: 20px;
+            right: 140px;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        
+        #start-screen, #game-over, #level-complete, #game-complete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10;
+        }
+        
+        h1 {
+            color: #fff;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 60px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+            animation: slideUp 1.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            0% {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            80% {
+                transform: translateY(-5px); /* Slight overshoot for snap */
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        h2 {
+            color: #ccc;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 300;
+        }
+        
+        button {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px 24px;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+        
+        button:hover {
+            background-color: #444;
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #aaa;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        
+        #game-over, #level-complete, #game-complete {
+            display: none;
+        }
+        
+        #level-transition {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game" width="800" height="500"></canvas>
+        <div id="ui">
+            <div class="ui-item">COINS: <span id="coin-count">0</span>/<span id="total-coins">0</span></div>
+        </div>
+        <div id="level-indicator">LEVEL: <span id="current-level">1</span>/10</div>
+        <div id="timer">TIME: <span id="time-left">60</span></div>
+        
+        <div id="start-screen">
+            <h1>CraveRush</h1>
+            <h2>A Minimalist Challenge</h2>
+            <button id="start-button">START GAME</button>
+            <div class="instructions">
+                Use ARROW KEYS to move and jump<br>
+                Collect all coins to complete each level<br>
+                Complete all 10 levels to win<br>
+                Difficulty increases with each level
+            </div>
+        </div>
+        
+        <div id="game-over">
+            <h1>GAME OVER</h1>
+            <div id="game-over-reason">You ran out of time</div>
+            <button id="restart-button">TRY AGAIN</button>
+        </div>
+        
+        <div id="level-complete">
+            <h1>LEVEL COMPLETE</h1>
+            <div id="level-stats">Coins: 0/0 | Time: 0s</div>
+            <button id="next-level-button">NEXT LEVEL</button>
+        </div>
+        
+        <div id="game-complete">
+            <h1>CONGRATULATIONS</h1>
+            <h2>You've completed all 10 levels!</h2>
+            <div id="final-stats">Total Time: 0s</div>
+            <button id="play-again-button">PLAY AGAIN</button>
+        </div>
+        
+        <div id="level-transition">
+            <div id="level-transition-text">LEVEL 1</div>
+        </div>
+    </div>
+
+    <script>
+        // Game elements
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const coinCountElement = document.getElementById('coin-count');
+        const totalCoinsElement = document.getElementById('total-coins');
+        const currentLevelElement = document.getElementById('current-level');
+        const timeLeftElement = document.getElementById('time-left');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over');
+        const levelCompleteScreen = document.getElementById('level-complete');
+        const gameCompleteScreen = document.getElementById('game-complete');
+        const levelTransition = document.getElementById('level-transition');
+        const levelTransitionText = document.getElementById('level-transition-text');
+        const gameOverReason = document.getElementById('game-over-reason');
+        const levelStats = document.getElementById('level-stats');
+        const finalStats = document.getElementById('final-stats');
+        
+        // Buttons
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const playAgainButton = document.getElementById('play-again-button');
+        
+        // Game settings
+        const TILE_SIZE = 20;
+        const GRAVITY = 0.5;
+        const JUMP_FORCE = -12;
+        let PLAYER_SPEED = 5;
+        
+        // Game state
+        let gameRunning = false;
+        let currentLevel = 1;
+        let timeLeft = 60;
+        let totalGameTime = 0;
+        let timer;
+        let player = {};
+        
+        // Input handling
+        const keys = {};
+        
+        // Game elements
+        let platforms = [];
+        let movingPlatforms = [];
+        let coins = [];
+        let totalCoins = 0;
+        
+        // Animation frame
+        let animationFrame;
+        let frameCount = 0;
+        
+        // Level definitions
+        const levels = [
+            // Level 1 - Basic introduction
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 60,
+                platforms: [
+                    { x: 0, y: 480, width: 800, height: 20 }, // Ground
+                    { x: 200, y: 400, width: 150, height: 15 },
+                    { x: 400, y: 350, width: 150, height: 15 },
+                    { x: 600, y: 300, width: 150, height: 15 }
+                ],
+                movingPlatforms: [],
+                coins: [
+                    { x: 250, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 450, y: 320, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 650, y: 270, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 2 - Slightly harder jumps
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 55,
+                platforms: [
+                    { x: 0, y: 480, width: 300, height: 20 }, // Partial ground
+                    { x: 400, y: 480, width: 400, height: 20 }, // Partial ground
+                    { x: 150, y: 400, width: 100, height: 15 },
+                    { x: 350, y: 350, width: 100, height: 15 },
+                    { x: 550, y: 300, width: 100, height: 15 },
+                    { x: 350, y: 250, width: 100, height: 15 },
+                    { x: 150, y: 200, width: 100, height: 15 }
+                ],
+                movingPlatforms: [],
+                coins: [
+                    { x: 180, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 380, y: 320, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 580, y: 270, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 380, y: 220, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 180, y: 170, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 3 - Introduce moving platforms
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 50,
+                platforms: [
+                    { x: 0, y: 480, width: 200, height: 20 }, // Starting platform
+                    { x: 600, y: 480, width: 200, height: 20 }, // Ending platform
+                    { x: 700, y: 400, width: 100, height: 15 },
+                    { x: 700, y: 320, width: 100, height: 15 }
+                ],
+                movingPlatforms: [
+                    { x: 250, y: 400, width: 100, height: 15, speedX: 2, minX: 250, maxX: 450 },
+                    { x: 450, y: 320, width: 100, height: 15, speedX: -2, minX: 250, maxX: 450 }
+                ],
+                coins: [
+                    { x: 350, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 350, y: 290, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 730, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 730, y: 290, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 4 - Vertical challenge
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 45,
+                platforms: [
+                    { x: 0, y: 480, width: 150, height: 20 }, // Starting platform
+                    { x: 650, y: 480, width: 150, height: 20 }, // Ending platform
+                    { x: 150, y: 420, width: 80, height: 15 },
+                    { x: 300, y: 360, width: 80, height: 15 },
+                    { x: 450, y: 300, width: 80, height: 15 },
+                    { x: 600, y: 240, width: 80, height: 15 },
+                    { x: 450, y: 180, width: 80, height: 15 },
+                    { x: 300, y: 120, width: 80, height: 15 },
+                    { x: 150, y: 60, width: 80, height: 15 }
+                ],
+                movingPlatforms: [],
+                coins: [
+                    { x: 180, y: 390, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 330, y: 330, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 480, y: 270, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 630, y: 210, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 480, y: 150, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 330, y: 90, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 180, y: 30, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 5 - Complex moving platforms
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 50,
+                platforms: [
+                    { x: 0, y: 480, width: 150, height: 20 }, // Starting platform
+                    { x: 650, y: 480, width: 150, height: 20 } // Ending platform
+                ],
+                movingPlatforms: [
+                    { x: 200, y: 400, width: 80, height: 15, speedX: 2, minX: 200, maxX: 520 },
+                    { x: 520, y: 320, width: 80, height: 15, speedX: -2, minX: 200, maxX: 520 },
+                    { x: 200, y: 240, width: 80, height: 15, speedX: 2, minX: 200, maxX: 520 },
+                    { x: 520, y: 160, width: 80, height: 15, speedX: -2, minX: 200, maxX: 520 }
+                ],
+                coins: [
+                    { x: 240, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 360, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 480, y: 370, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 240, y: 290, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 360, y: 290, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 480, y: 290, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 240, y: 210, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 360, y: 210, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 480, y: 210, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 6 - Precision jumps
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 45,
+                platforms: [
+                    { x: 0, y: 480, width: 100, height: 20 }, // Starting platform
+                    { x: 700, y: 480, width: 100, height: 20 }, // Ending platform
+                    { x: 150, y: 480, width: 40, height: 15 },
+                    { x: 250, y: 450, width: 40, height: 15 },
+                    { x: 350, y: 420, width: 40, height: 15 },
+                    { x: 450, y: 390, width: 40, height: 15 },
+                    { x: 550, y: 360, width: 40, height: 15 },
+                    { x: 650, y: 330, width: 40, height: 15 },
+                    { x: 550, y: 300, width: 40, height: 15 },
+                    { x: 450, y: 270, width: 40, height: 15 },
+                    { x: 350, y: 240, width: 40, height: 15 },
+                    { x: 250, y: 210, width: 40, height: 15 },
+                    { x: 150, y: 180, width: 40, height: 15 }
+                ],
+                movingPlatforms: [],
+                coins: [
+                    { x: 160, y: 450, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 260, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 360, y: 390, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 460, y: 360, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 560, y: 330, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 660, y: 300, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 560, y: 270, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 460, y: 240, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 360, y: 210, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 260, y: 180, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 160, y: 150, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 7 - Vertical moving platforms
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 55,
+                platforms: [
+                    { x: 0, y: 480, width: 150, height: 20 }, // Starting platform
+                    { x: 650, y: 480, width: 150, height: 20 }, // Ending platform
+                    { x: 300, y: 480, width: 200, height: 20 } // Middle platform
+                ],
+                movingPlatforms: [
+                    { x: 200, y: 400, width: 80, height: 15, speedY: 2, minY: 200, maxY: 400 },
+                    { x: 520, y: 400, width: 80, height: 15, speedY: -2, minY: 200, maxY: 400 },
+                    { x: 360, y: 300, width: 80, height: 15, speedY: 3, minY: 100, maxY: 300 }
+                ],
+                coins: [
+                    { x: 240, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 240, y: 250, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 400, y: 250, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 400, y: 150, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 560, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 560, y: 250, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 8 - Complex pattern
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 60,
+                platforms: [
+                    { x: 0, y: 480, width: 100, height: 20 }, // Starting platform
+                    { x: 700, y: 100, width: 100, height: 20 }, // Ending platform (high up)
+                    { x: 150, y: 430, width: 60, height: 15 },
+                    { x: 270, y: 380, width: 60, height: 15 },
+                    { x: 390, y: 330, width: 60, height: 15 },
+                    { x: 510, y: 280, width: 60, height: 15 },
+                    { x: 630, y: 230, width: 60, height: 15 },
+                    { x: 510, y: 180, width: 60, height: 15 },
+                    { x: 390, y: 130, width: 60, height: 15 }
+                ],
+                movingPlatforms: [
+                    { x: 200, y: 200, width: 60, height: 15, speedX: 3, minX: 200, maxX: 540 }
+                ],
+                coins: [
+                    { x: 170, y: 400, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 290, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 410, y: 300, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 530, y: 250, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 650, y: 200, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 530, y: 150, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 410, y: 100, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 230, y: 170, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 370, y: 170, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 510, y: 170, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 9 - Speed run
+            {
+                playerStart: { x: 50, y: 400 },
+                timeLimit: 40,
+                platforms: [
+                    { x: 0, y: 480, width: 100, height: 20 }, // Starting platform
+                    { x: 700, y: 480, width: 100, height: 20 } // Ending platform
+                ],
+                movingPlatforms: [
+                    { x: 150, y: 450, width: 60, height: 15, speedX: 4, minX: 150, maxX: 590 },
+                    { x: 590, y: 380, width: 60, height: 15, speedX: -4, minX: 150, maxX: 590 },
+                    { x: 150, y: 310, width: 60, height: 15, speedX: 4, minX: 150, maxX: 590 },
+                    { x: 590, y: 240, width: 60, height: 15, speedX: -4, minX: 150, maxX: 590 },
+                    { x: 150, y: 170, width: 60, height: 15, speedX: 4, minX: 150, maxX: 590 }
+                ],
+                coins: [
+                    { x: 180, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 300, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 420, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 540, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 180, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 300, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 420, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 540, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 180, y: 280, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 300, y: 280, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 420, y: 280, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 540, y: 280, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            },
+            // Level 10 - Final challenge
+            {
+                playerStart: { x: 50, y: 450 },
+                timeLimit: 70,
+                platforms: [
+                    { x: 0, y: 480, width: 100, height: 20 }, // Starting platform
+                    { x: 700, y: 100, width: 100, height: 20 } // Ending platform (high up)
+                ],
+                movingPlatforms: [
+                    { x: 150, y: 450, width: 50, height: 15, speedX: 5, minX: 150, maxX: 600 },
+                    { x: 250, y: 380, width: 50, height: 15, speedY: 3, minY: 200, maxY: 380 },
+                    { x: 400, y: 350, width: 50, height: 15, speedX: -4, minX: 350, maxX: 600 },
+                    { x: 550, y: 280, width: 50, height: 15, speedY: -3, minY: 150, maxY: 280 },
+                    { x: 400, y: 200, width: 50, height: 15, speedX: 4, minX: 200, maxX: 450 },
+                    { x: 250, y: 150, width: 50, height: 15, speedY: 2, minY: 100, maxY: 200 },
+                    { x: 600, y: 180, width: 50, height: 15, speedX: -3, minX: 500, maxX: 650 }
+                ],
+                coins: [
+                    { x: 180, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 300, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 420, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 540, y: 420, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 270, y: 350, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 270, y: 250, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 420, y: 320, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 500, y: 320, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 570, y: 250, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 570, y: 180, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 420, y: 170, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 300, y: 170, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 250, y: 120, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 620, y: 150, width: TILE_SIZE, height: TILE_SIZE },
+                    { x: 730, y: 70, width: TILE_SIZE, height: TILE_SIZE }
+                ]
+            }
+        ];
+        
+        // Initialize the game
+        function init() {
+            // Reset player
+            player = {
+                x: levels[currentLevel - 1].playerStart.x,
+                y: levels[currentLevel - 1].playerStart.y,
+                width: TILE_SIZE,
+                height: TILE_SIZE * 1.5,
+                velocityX: 0,
+                velocityY: 0,
+                jumping: false,
+                coins: 0,
+                facingRight: true
+            };
+            
+            // Set player speed based on level (increases slightly with level)
+            PLAYER_SPEED = 5 + (currentLevel - 1) * 0.2;
+            
+            // Load level
+            platforms = [...levels[currentLevel - 1].platforms];
+            movingPlatforms = [...levels[currentLevel - 1].movingPlatforms];
+            
+            // Create coins
+            coins = levels[currentLevel - 1].coins.map(coin => ({
+                ...coin,
+                collected: false
+            }));
+            
+            totalCoins = coins.length;
+            
+            // Set time limit
+            timeLeft = levels[currentLevel - 1].timeLimit;
+            
+            // Update UI
+            coinCountElement.textContent = player.coins;
+            totalCoinsElement.textContent = totalCoins;
+            currentLevelElement.textContent = currentLevel;
+            timeLeftElement.textContent = timeLeft;
+            
+            // Start timer
+            if (timer) {
+                clearInterval(timer);
+            }
+            
+            timer = setInterval(() => {
+                if (gameRunning) {
+                    timeLeft--;
+                    timeLeftElement.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        gameOver("Time's up!");
+                    }
+                }
+            }, 1000);
+            
+            // Reset frame count
+            frameCount = 0;
+            
+            // Start game loop
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            gameLoop();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (gameRunning) {
+                update();
+                render();
+            }
+            animationFrame = requestAnimationFrame(gameLoop);
+        }
+        
+        // Update game state
+        function update() {
+            frameCount++;
+            
+            // Handle input
+            player.velocityX = 0;
+            
+            if (keys['ArrowLeft']) {
+                player.velocityX = -PLAYER_SPEED;
+                player.facingRight = false;
+            }
+            
+            if (keys['ArrowRight']) {
+                player.velocityX = PLAYER_SPEED;
+                player.facingRight = true;
+            }
+            
+            if (keys['ArrowUp'] && !player.jumping) {
+                player.velocityY = JUMP_FORCE;
+                player.jumping = true;
+            }
+            
+            // Apply gravity
+            player.velocityY += GRAVITY;
+            
+            // Cap falling speed
+            if (player.velocityY > 15) player.velocityY = 15;
+            
+            // Update position
+            player.x += player.velocityX;
+            player.y += player.velocityY;
+            
+            // Update moving platforms
+            for (const platform of movingPlatforms) {
+                // Horizontal movement
+                if (platform.speedX) {
+                    platform.x += platform.speedX;
+                    
+                    // Reverse direction if reached bounds
+                    if (platform.x <= platform.minX || platform.x >= platform.maxX) {
+                        platform.speedX = -platform.speedX;
+                    }
+                    
+                    // Move player with platform if standing on it
+                    if (player.x + player.width > platform.x &&
+                        player.x < platform.x + platform.width &&
+                        player.y + player.height > platform.y &&
+                        player.y + player.height < platform.y + platform.height / 2 &&
+                        player.velocityY >= 0) {
+                        player.x += platform.speedX;
+                    }
+                }
+                
+                // Vertical movement
+                if (platform.speedY) {
+                    platform.y += platform.speedY;
+                    
+                    // Reverse direction if reached bounds
+                    if (platform.y <= platform.minY || platform.y >= platform.maxY) {
+                        platform.speedY = -platform.speedY;
+                    }
+                    
+                    // Move player with platform if standing on it
+                    if (player.x + player.width > platform.x &&
+                        player.x < platform.x + platform.width &&
+                        player.y + player.height > platform.y &&
+                        player.y + player.height < platform.y + platform.height / 2 &&
+                        player.velocityY >= 0) {
+                        player.y += platform.speedY;
+                    }
+                }
+            }
+            
+            // Check platform collisions
+            player.jumping = true;
+            
+            // Check static platforms
+            for (const platform of platforms) {
+                // Check if player is on top of platform
+                if (player.x + player.width > platform.x &&
+                    player.x < platform.x + platform.width &&
+                    player.y + player.height > platform.y &&
+                    player.y + player.height < platform.y + platform.height / 2 &&
+                    player.velocityY > 0) {
+                    
+                    player.jumping = false;
+                    player.velocityY = 0;
+                    player.y = platform.y - player.height;
+                }
+            }
+            
+            // Check moving platforms
+            for (const platform of movingPlatforms) {
+                // Check if player is on top of platform
+                if (player.x + player.width > platform.x &&
+                    player.x < platform.x + platform.width &&
+                    player.y + player.height > platform.y &&
+                    player.y + player.height < platform.y + platform.height / 2 &&
+                    player.velocityY > 0) {
+                    
+                    player.jumping = false;
+                    player.velocityY = 0;
+                    player.y = platform.y - player.height;
+                }
+            }
+            
+            // Check coin collisions
+            for (const coin of coins) {
+                if (!coin.collected &&
+                    player.x + player.width > coin.x &&
+                    player.x < coin.x + coin.width &&
+                    player.y + player.height > coin.y &&
+                    player.y < coin.y + coin.height) {
+                    
+                    coin.collected = true;
+                    player.coins++;
+                    coinCountElement.textContent = player.coins;
+                    
+                    // Check if all coins are collected
+                    if (player.coins === totalCoins) {
+                        levelComplete();
+                    }
+                }
+            }
+            
+            // Check boundaries
+            if (player.x < 0) {
+                player.x = 0;
+            }
+            
+            if (player.x + player.width > canvas.width) {
+                player.x = canvas.width - player.width;
+            }
+            
+            // Check if player fell off the screen
+            if (player.y > canvas.height) {
+                gameOver("You fell off the level!");
+            }
+        }
+        
+        // Render game
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw subtle grid pattern
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw platforms
+            ctx.fillStyle = '#333';
+            for (const platform of platforms) {
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                
+                // Platform details
+                ctx.fillStyle = '#444';
+                ctx.fillRect(platform.x, platform.y, platform.width, 3);
+                ctx.fillStyle = '#333';
+            }
+            
+            // Draw moving platforms
+            ctx.fillStyle = '#555';
+            for (const platform of movingPlatforms) {
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                
+                // Platform details
+                ctx.fillStyle = '#666';
+                ctx.fillRect(platform.x, platform.y, platform.width, 3);
+                ctx.fillStyle = '#555';
+            }
+            
+            // Draw coins
+            for (const coin of coins) {
+                if (!coin.collected) {
+                    // Coin animation
+                    const coinSize = TILE_SIZE * (0.8 + Math.sin(frameCount * 0.1) * 0.1);
+                    const coinX = coin.x + (TILE_SIZE - coinSize) / 2;
+                    const coinY = coin.y + (TILE_SIZE - coinSize) / 2;
+                    
+                    // Draw coin
+                    ctx.fillStyle = '#ccc';
+                    ctx.beginPath();
+                    ctx.arc(coinX + coinSize/2, coinY + coinSize/2, coinSize/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Coin inner detail
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(coinX + coinSize/2, coinY + coinSize/2, coinSize/4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Draw player
+            ctx.fillStyle = '#ddd';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            // Player details
+            // Head
+            ctx.fillStyle = '#eee';
+            ctx.fillRect(player.x, player.y, player.width, player.height/3);
+            
+            // Eyes
+            ctx.fillStyle = '#222';
+            if (player.facingRight) {
+                ctx.fillRect(player.x + player.width - 8, player.y + 5, 4, 4);
+            } else {
+                ctx.fillRect(player.x + 4, player.y + 5, 4, 4);
+            }
+            
+            // Legs
+            ctx.fillStyle = '#bbb';
+            ctx.fillRect(player.x, player.y + player.height - 6, player.width/2 - 1, 6);
+            ctx.fillRect(player.x + player.width/2 + 1, player.y + player.height - 6, player.width/2 - 1, 6);
+        }
+        
+        // Level complete
+        function levelComplete() {
+            gameRunning = false;
+            clearInterval(timer);
+            cancelAnimationFrame(animationFrame);
+            
+            // Update level stats
+            levelStats.textContent = `Coins: ${player.coins}/${totalCoins} | Time: ${levels[currentLevel - 1].timeLimit - timeLeft}s`;
+            
+            // Update total game time
+            totalGameTime += (levels[currentLevel - 1].timeLimit - timeLeft);
+            
+            // Check if all levels are complete
+            if (currentLevel === 10) {
+                finalStats.textContent = `Total Time: ${totalGameTime}s`;
+                gameCompleteScreen.style.display = 'flex';
+            } else {
+                levelCompleteScreen.style.display = 'flex';
+            }
+        }
+        
+        // Game over
+        function gameOver(reason) {
+            if (!gameRunning) return; // Prevent multiple game over calls
+            
+            gameRunning = false;
+            clearInterval(timer);
+            cancelAnimationFrame(animationFrame);
+            
+            gameOverReason.textContent = reason;
+            gameOverScreen.style.display = 'flex';
+        }
+        
+        // Show level transition
+        function showLevelTransition() {
+            levelTransitionText.textContent = `LEVEL ${currentLevel}`;
+            levelTransition.style.opacity = '1';
+            
+            setTimeout(() => {
+                levelTransition.style.opacity = '0';
+                
+                setTimeout(() => {
+                    gameRunning = true;
+                    init();
+                }, 500);
+            }, 1500);
+        }
+        
+        // Event listeners
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            
+            // Prevent scrolling with arrow keys
+            if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            showLevelTransition();
+        });
+        
+        restartButton.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            showLevelTransition();
+        });
+        
+        nextLevelButton.addEventListener('click', () => {
+            levelCompleteScreen.style.display = 'none';
+            currentLevel++;
+            currentLevelElement.textContent = currentLevel;
+            showLevelTransition();
+        });
+        
+        playAgainButton.addEventListener('click', () => {
+            gameCompleteScreen.style.display = 'none';
+            currentLevel = 1;
+            currentLevelElement.textContent = currentLevel;
+            totalGameTime = 0;
+            showLevelTransition();
+        });
+    </script>
+</body>
+</html>

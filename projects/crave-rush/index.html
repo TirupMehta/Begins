@@ -93,8 +93,8 @@
             margin-bottom: 20px;
             text-align: center;
             letter-spacing: 3px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-            animation: slideUp 1.5s ease-out forwards;
+            text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.6);
+            animation: slideUp 0.5s ease-out forwards;
         }
 
         @keyframes slideUp {
@@ -120,23 +120,28 @@
             font-weight: 300;
         }
         
+
         button {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 12px 24px;
-            font-family: 'Arial', sans-serif;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.2s ease;
-            border-radius: 4px;
+          background: #363636;
+          font-family: inherit;
+          padding: 0.6em 1.3em;
+          font-weight: 900;
+          font-size: 15px;
+          border: 2px solid rgb(255, 252, 252);
+          border-radius: 0.8em;
+          box-shadow: 0.1em 0.3em;
+          cursor: pointer;
         }
-        
+
         button:hover {
-            background-color: #444;
-            transform: translateY(-2px);
+          box-shadow: 0.15em 0.15em;
         }
+
+        button:active {
+          transform: translate(0.05em, 0.05em);
+          box-shadow: 0.05em 0.05em;
+        }
+
         
         .instructions {
             text-align: center;

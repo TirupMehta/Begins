@@ -990,7 +990,7 @@
         }
 
         document.getElementById('close-popup').addEventListener('click', () => {
-            document.getElementById('mobile-popup').style.display = 'none';
+            window.close(); // Attempts to close the browser tab/window
         });
 
     </script>

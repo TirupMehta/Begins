@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Circular Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #121212;
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .canvas-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        #canvas-wrapper {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .speed-control input {
+            flex: 1;
+        }
+        
+        .speed-value {
+            min-width: 3rem;
+            text-align: right;
+        }
+        
+        .tool-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background-color: #4a5568;
+        }
+        
+        button.active {
+            background-color: #6b7280;
+            border-color: #9ca3af;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .color-option:hover, .color-option.active {
+            transform: scale(1.1);
+            border-color: #9ca3af;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+        }
+        
+        footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            #canvas-wrapper {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .controls {
+                max-width: 300px;
+            }
+        }
+
+        .icon-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .icon-btn {
+            font-size: 1.2rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover, .icon-btn.active {
+            background-color: #4a5568;
+            transform: scale(1.1);
+            border-color: #9ca3af;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #4a5568;
+            background-color: #2d3748;
+            color: #e5e7eb;
+        }
+
+        .text-size-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .text-size-control input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Interactive Circular Canvas</h1>
+        <p>Draw freely within the circle and control the rotation speed</p>
+    </header>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas-wrapper">
+                <canvas id="drawingCanvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Drawing Tools</label>
+                <div class="tool-buttons">
+                    <button id="penTool" class="active">Pen</button>
+                    <button id="eraserTool">Eraser</button>
+                    <button id="textTool">Text</button>
+                    <button id="lineTool">Line</button>
+                    <button id="circleTool">Circle</button>
+                    <button id="rectangleTool">Rectangle</button>
+                    <button id="iconTool">Icon</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label>Colors</label>
+                <div class="color-picker">
+                    <div class="color-option active" style="background-color: #000000;" data-color="#000000"></div>
+                    <div class="color-option" style="background-color: #ef4444;" data-color="#ef4444"></div>
+                    <div class="color-option" style="background-color: #3b82f6;" data-color="#3b82f6"></div>
+                    <div class="color-option" style="background-color: #10b981;" data-color="#10b981"></div>
+                    <div class="color-option" style="background-color: #f59e0b;" data-color="#f59e0b"></div>
+                    <div class="color-option" style="background-color: #8b5cf6;" data-color="#8b5cf6"></div>
+                </div>
+            </div>
+
+            <div class="control-group icon-picker-container" style="display: none;">
+                <label>Icons</label>
+                <div class="icon-picker">
+                    <button class="icon-btn active" data-icon="✓">✓</button>
+                    <button class="icon-btn" data-icon="✗">✗</button>
+                    <button class="icon-btn" data-icon="★">★</button>
+                    <button class="icon-btn" data-icon="♥">♥</button>
+                    <button class="icon-btn" data-icon="→">→</button>
+                    <button class="icon-btn" data-icon="←">←</button>
+                    <button class="icon-btn" data-icon="↑">↑</button>
+                    <button class="icon-btn" data-icon="↓">↓</button>
+                    <button class="icon-btn" data-icon="○">○</button>
+                    <button class="icon-btn" data-icon="□">□</button>
+                    <button class="icon-btn" data-icon="△">△</button>
+                    <button class="icon-btn" data-icon="!">!</button>
+                </div>
+            </div>
+
+            <div class="control-group text-tool-container" style="display: none;">
+                <label>Text Options</label>
+                <input type="text" id="textInput" placeholder="Enter text..." class="text-input">
+                <div class="text-size-control">
+                    <label>Text Size:</label>
+                    <input type="range" id="textSize" min="10" max="50" value="20">
+                    <span id="textSizeValue">20px</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label>Line Width</label>
+                <div class="speed-control">
+                    <input type="range" id="lineWidth" min="1" max="20" value="5">
+                    <span class="speed-value" id="lineWidthValue">5px</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label>Rotation Speed</label>
+                <div class="speed-control">
+                    <input type="range" id="speedControl" min="0" max="100" value="0">
+                    <span class="speed-value" id="speedValue">0%</span>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="clearCanvas">Clear Canvas</button>
+                <button id="toggleRotation">Start Rotation</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2024 Tirup Mehta. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas setup
+            const canvas = document.getElementById('drawingCanvas');
+            const ctx = canvas.getContext('2d');
+            const canvasWrapper = document.getElementById('canvas-wrapper');
+            
+            // Set canvas dimensions
+            function resizeCanvas() {
+                const size = canvasWrapper.offsetWidth;
+                canvas.width = size;
+                canvas.height = size;
+                
+                // Clear and redraw when resizing
+                drawCircularClip();
+            }
+            
+            // Initialize canvas size
+            resizeCanvas();
+            
+            // Handle window resize
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Drawing state
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            let currentColor = '#000000';
+            let currentLineWidth = 5;
+            let isEraser = false;
+            let rotationAngle = 0;
+            let rotationSpeed = 0;
+            let isRotating = false;
+            let animationId = null;
+            
+            // Create a circular clipping path
+            function drawCircularClip() {
+                ctx.save();
+                ctx.beginPath();
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
+            
+            // Initialize canvas
+            drawCircularClip();
+            
+            // Drawing functions
+            function startDrawing(e) {
+                isDrawing = true;
+                const pos = getCanvasCoordinates(e);
+                [lastX, lastY] = [pos.x, pos.y];
+
+                // Store starting position for shapes and lines
+                [startX, startY] = [pos.x, pos.y];
+                
+                // For text and icon, add them immediately on click
+                if (currentTool === 'text' && textInput.value.trim() !== '') {
+                    drawText(pos.x, pos.y, textInput.value);
+                    isDrawing = false;
+                } else if (currentTool === 'icon') {
+                    drawIcon(pos.x, pos.y, selectedIcon);
+                    isDrawing = false;
+                }
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const pos = getCanvasCoordinates(e);
+                
+                ctx.save();
+                
+                // Apply rotation transformation
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                ctx.translate(centerX, centerY);
+                ctx.rotate(-rotationAngle * Math.PI / 180);
+                ctx.translate(-centerX, -centerY);
+                
+                // Set drawing style
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.lineWidth = currentLineWidth;
+                
+                if (isEraser) {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.strokeStyle = 'rgba(0,0,0,1)';
+                } else {
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = currentColor;
+                }
+                
+                // Different drawing behavior based on tool
+                if (currentTool === 'pen' || currentTool === 'eraser') {
+                    // Draw line
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+                
+                [lastX, lastY] = [pos.x, pos.y];
+            }
+            
+            function stopDrawing() {
+                if (!isDrawing) return;
+                
+                // Complete shape drawing when mouse is released
+                if (currentTool === 'line' || currentTool === 'circle' || currentTool === 'rectangle') {
+                    const pos = { x: lastX, y: lastY };
+                    
+                    ctx.save();
+                    
+                    // Apply rotation transformation
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate(-rotationAngle * Math.PI / 180);
+                    ctx.translate(-centerX, -centerY);
+                    
+                    ctx.lineWidth = currentLineWidth;
+                    ctx.strokeStyle = currentColor;
+                    ctx.fillStyle = currentColor;
+                    
+                    if (currentTool === 'line') {
+                        ctx.beginPath();
+                        ctx.moveTo(startX, startY);
+                        ctx.lineTo(pos.x, pos.y);
+                        ctx.stroke();
+                    } else if (currentTool === 'circle') {
+                        const radius = Math.sqrt(Math.pow(pos.x - startX, 2) + Math.pow(pos.y - startY, 2));
+                        ctx.beginPath();
+                        ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+                        ctx.stroke();
+                    } else if (currentTool === 'rectangle') {
+                        const width = pos.x - startX;
+                        const height = pos.y - startY;
+                        ctx.beginPath();
+                        ctx.rect(startX, startY, width, height);
+                        ctx.stroke();
+                    }
+                    
+                    ctx.restore();
+                }
+                
+                isDrawing = false;
+            }
+
+            // Function to draw text
+            function drawText(x, y, text) {
+                if (!text || text.trim() === '') return;
+                
+                ctx.save();
+                
+                // Apply rotation transformation
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                ctx.translate(centerX, centerY);
+                ctx.rotate(-rotationAngle * Math.PI / 180);
+                ctx.translate(-centerX, -centerY);
+                
+                ctx.font = `${textSize}px Arial`;
+                ctx.fillStyle = currentColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, x, y);
+                
+                ctx.restore();
+            }
+
+            // Function to draw emoji
+            function drawIcon(x, y, icon) {
+                if (!icon) return;
+                
+                ctx.save();
+                
+                // Apply rotation transformation
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                ctx.translate(centerX, centerY);
+                ctx.rotate(-rotationAngle * Math.PI / 180);
+                ctx.translate(-centerX, -centerY);
+                
+                const iconSize = textSize * 1.2;
+                
+                // Draw icon background
+                ctx.fillStyle = currentColor;
+                ctx.beginPath();
+                ctx.arc(x, y, iconSize/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw icon symbol
+                ctx.font = `${iconSize * 0.7}px Arial`;
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(icon, x, y);
+                
+                ctx.restore();
+            }
+            
+            // Get canvas coordinates from mouse/touch event
+            function getCanvasCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                let clientX, clientY;
+                
+                if (e.type.includes('touch')) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                // Get the raw coordinates
+                const rawX = (clientX - rect.left) * scaleX;
+                const rawY = (clientY - rect.top) * scaleY;
+                
+                // Apply inverse rotation to get correct coordinates
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                // Translate point to origin
+                const translatedX = rawX - centerX;
+                const translatedY = rawY - centerY;
+                
+                // Rotate point
+                const angle = rotationAngle * Math.PI / 180;
+                const rotatedX = translatedX * Math.cos(angle) - translatedY * Math.sin(angle);
+                const rotatedY = translatedX * Math.sin(angle) + translatedY * Math.cos(angle);
+                
+                // Translate point back
+                return {
+                    x: rotatedX + centerX,
+                    y: rotatedY + centerY
+                };
+            }
+            
+            // Animation function for rotation
+            function animate() {
+                if (!isRotating) return;
+                
+                rotationAngle = (rotationAngle + rotationSpeed * 0.2) % 360;
+                canvas.style.transform = `rotate(${rotationAngle}deg)`;
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // Event listeners for drawing
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch support
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startDrawing(e);
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                draw(e);
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+            
+            // UI Controls
+            const speedControl = document.getElementById('speedControl');
+            const speedValue = document.getElementById('speedValue');
+            const lineWidthControl = document.getElementById('lineWidth');
+            const lineWidthValue = document.getElementById('lineWidthValue');
+            const clearButton = document.getElementById('clearCanvas');
+            const toggleRotationButton = document.getElementById('toggleRotation');
+            const penTool = document.getElementById('penTool');
+            const eraserTool = document.getElementById('eraserTool');
+            const colorOptions = document.querySelectorAll('.color-option');
+
+            // Tool variables
+            let currentTool = 'pen';
+            let startX, startY;
+            let selectedIcon = '✓';
+            let textSize = 20;
+
+            // Text tool
+            const textTool = document.getElementById('textTool');
+            const textToolContainer = document.querySelector('.text-tool-container');
+            const textInput = document.getElementById('textInput');
+            const textSizeControl = document.getElementById('textSize');
+            const textSizeValue = document.getElementById('textSizeValue');
+
+            // Line tool
+            const lineTool = document.getElementById('lineTool');
+
+            // Shape tools
+            const circleTool = document.getElementById('circleTool');
+            const rectangleTool = document.getElementById('rectangleTool');
+
+            // Emoji tool
+            const iconTool = document.getElementById('iconTool');
+            const iconPickerContainer = document.querySelector('.icon-picker-container');
+            const iconButtons = document.querySelectorAll('.icon-btn');
+
+            // Function to reset all tool states
+            function resetToolStates() {
+                isEraser = false;
+                currentTool = 'pen';
+                
+                // Hide tool-specific containers
+                textToolContainer.style.display = 'none';
+                iconPickerContainer.style.display = 'none';
+                
+                // Remove active class from all tools
+                document.querySelectorAll('.tool-buttons button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            }
+            
+            // Speed control
+            speedControl.addEventListener('input', function() {
+                rotationSpeed = parseInt(this.value) * 3; // Multiply by 3 for faster rotation
+                speedValue.textContent = `${this.value}%`;
+                
+                if (rotationSpeed > 0 && !isRotating) {
+                    isRotating = true;
+                    toggleRotationButton.textContent = 'Stop Rotation';
+                    animate();
+                } else if (rotationSpeed === 0 && isRotating) {
+                    isRotating = false;
+                    toggleRotationButton.textContent = 'Start Rotation';
+                    cancelAnimationFrame(animationId);
+                }
+            });
+            
+            // Line width control
+            lineWidthControl.addEventListener('input', function() {
+                currentLineWidth = parseInt(this.value);
+                lineWidthValue.textContent = `${this.value}px`;
+            });
+            
+            // Clear canvas
+            clearButton.addEventListener('click', function() {
+                drawCircularClip();
+            });
+            
+            // Toggle rotation
+            toggleRotationButton.addEventListener('click', function() {
+                isRotating = !isRotating;
+                
+                if (isRotating) {
+                    this.textContent = 'Stop Rotation';
+                    if (rotationSpeed === 0) {
+                        rotationSpeed = 20;
+                        speedControl.value = 20;
+                        speedValue.textContent = '20%';
+                    }
+                    animate();
+                } else {
+                    this.textContent = 'Start Rotation';
+                    cancelAnimationFrame(animationId);
+                }
+            });
+
+            // Update tool selection handlers
+            penTool.addEventListener('click', function() {
+                resetToolStates();
+                currentTool = 'pen';
+                penTool.classList.add('active');
+            });
+
+            eraserTool.addEventListener('click', function() {
+                resetToolStates();
+                isEraser = true;
+                currentTool = 'eraser';
+                eraserTool.classList.add('active');
+            });
+
+            textTool.addEventListener('click', function() {
+                resetToolStates();
+                currentTool = 'text';
+                textTool.classList.add('active');
+                textToolContainer.style.display = 'block';
+            });
+
+            lineTool.addEventListener('click', function() {
+                resetToolStates();
+                currentTool = 'line';
+                lineTool.classList.add('active');
+            });
+
+            circleTool.addEventListener('click', function() {
+                resetToolStates();
+                currentTool = 'circle';
+                circleTool.classList.add('active');
+            });
+
+            rectangleTool.addEventListener('click', function() {
+                resetToolStates();
+                currentTool = 'rectangle';
+                rectangleTool.classList.add('active');
+            });
+
+            iconTool.addEventListener('click', function() {
+                resetToolStates();
+                currentTool = 'icon';
+                iconTool.classList.add('active');
+                iconPickerContainer.style.display = 'block';
+            });
+
+            // Text size control
+            textSizeControl.addEventListener('input', function() {
+                textSize = parseInt(this.value);
+                textSizeValue.textContent = `${textSize}px`;
+            });
+
+            // Emoji selection
+            iconButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectedIcon = this.dataset.icon;
+                    iconButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Color selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    currentColor = this.dataset.color;
+                    
+                    // Update active state
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Switch to pen tool when selecting a color
+                    isEraser = false;
+                    penTool.classList.add('active');
+                    eraserTool.classList.remove('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

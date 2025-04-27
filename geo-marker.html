@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geo Marker | Finding You in the Void</title>
+    <title>Geo Marker | IP Location Tracker</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
-            --dark-bg: #0a0a0f;
-            --darker-bg: #050508;
-            --accent: #ff2a2a;
-            --accent-glow: rgba(255, 42, 42, 0.5);
-            --text: #e0e0e0;
+            --dark-bg: #000000;
+            --darker-bg: #0a0a0a;
+            --accent: #ffffff;
+            --accent-glow: rgba(255, 255, 255, 0.5);
+            --text: #ffffff;
             --secondary-text: #a0a0a0;
         }
         
@@ -19,7 +19,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', 'Helvetica Neue', sans-serif;
         }
         
         body {
@@ -42,6 +42,7 @@
             top: 0;
             left: 0;
             z-index: 0;
+            opacity: 0.5;
         }
         
         .container {
@@ -53,24 +54,23 @@
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 42, 42, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         h1 {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            letter-spacing: 1px;
             color: var(--accent);
-            text-shadow: 0 0 10px var(--accent-glow);
+            font-weight: 600;
         }
         
         .tagline {
             text-align: center;
             margin-bottom: 30px;
-            font-style: italic;
             color: var(--secondary-text);
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
         
         .search-container {
@@ -86,7 +86,7 @@
             color: var(--text);
             border-radius: 5px 0 0 5px;
             font-size: 1rem;
-            border: 1px solid rgba(255, 42, 42, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-right: none;
         }
         
@@ -98,17 +98,17 @@
         #search-btn {
             padding: 12px 20px;
             background-color: var(--accent);
-            color: white;
+            color: var(--dark-bg);
             border: none;
             border-radius: 0 5px 5px 0;
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 600;
             transition: all 0.3s ease;
         }
         
         #search-btn:hover {
-            background-color: #ff4444;
-            box-shadow: 0 0 10px var(--accent-glow);
+            background-color: rgba(255, 255, 255, 0.8);
         }
         
         .results {
@@ -122,21 +122,14 @@
             background-color: rgba(255, 255, 255, 0.03);
             padding: 20px;
             border-radius: 5px;
-            border: 1px solid rgba(255, 42, 42, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .info-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 15px;
             color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .info-title::before {
-            content: ">";
-            color: var(--accent);
+            font-weight: 500;
         }
         
         .info-item {
@@ -151,7 +144,7 @@
         
         .info-value {
             color: var(--text);
-            font-weight: bold;
+            font-weight: 500;
         }
         
         .copy-btn {
@@ -161,11 +154,11 @@
             cursor: pointer;
             margin-left: 10px;
             transition: all 0.3s ease;
+            opacity: 0.7;
         }
         
         .copy-btn:hover {
-            color: #ff4444;
-            text-shadow: 0 0 5px var(--accent-glow);
+            opacity: 1;
         }
         
         #map {
@@ -173,7 +166,7 @@
             width: 100%;
             border-radius: 5px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 42, 42, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .toast {
@@ -182,13 +175,14 @@
             left: 50%;
             transform: translateX(-50%);
             background-color: var(--accent);
-            color: white;
+            color: var(--dark-bg);
             padding: 10px 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease;
+            font-weight: 500;
         }
         
         .toast.show {
@@ -199,6 +193,7 @@
             display: none;
             text-align: center;
             margin: 20px 0;
+            color: var(--secondary-text);
         }
         
         .loading::after {
@@ -206,7 +201,7 @@
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255, 42, 42, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             border-top-color: var(--accent);
             animation: spin 1s ease-in-out infinite;
@@ -222,7 +217,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background-color: rgba(255, 42, 42, 0.5);
+            background-color: rgba(255, 255, 255, 0.3);
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: 9999;
@@ -233,15 +228,15 @@
         @keyframes pulse {
             0% {
                 transform: translate(-50%, -50%) scale(0.5);
-                opacity: 0.7;
+                opacity: 0.5;
             }
             50% {
                 transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
+                opacity: 0.2;
             }
             100% {
                 transform: translate(-50%, -50%) scale(0.5);
-                opacity: 0.7;
+                opacity: 0.5;
             }
         }
         
@@ -255,7 +250,7 @@
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -266,14 +261,14 @@
     
     <div class="container">
         <h1>GEO MARKER</h1>
-        <p class="tagline">No distance can hide you from me. Finding you in the void.</p>
+        <p class="tagline">IP Geolocation Tracking System</p>
         
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Enter IP address or location...">
+            <input type="text" id="search-input" placeholder="Enter IP address (e.g. 8.8.8.8)">
             <button id="search-btn">LOCATE</button>
         </div>
         
-        <div class="loading" id="loading">Searching the void...</div>
+        <div class="loading" id="loading">Processing request...</div>
         
         <div id="map"></div>
         
@@ -328,14 +323,14 @@
         particlesJS('particles-js', {
             "particles": {
                 "number": {
-                    "value": 80,
+                    "value": 60,
                     "density": {
                         "enable": true,
                         "value_area": 800
                     }
                 },
                 "color": {
-                    "value": "#ff2a2a"
+                    "value": "#ffffff"
                 },
                 "shape": {
                     "type": "circle",
@@ -348,7 +343,7 @@
                     }
                 },
                 "opacity": {
-                    "value": 0.5,
+                    "value": 0.3,
                     "random": false,
                     "anim": {
                         "enable": false,
@@ -370,13 +365,13 @@
                 "line_linked": {
                     "enable": true,
                     "distance": 150,
-                    "color": "#ff2a2a",
+                    "color": "#ffffff",
                     "opacity": 0.2,
                     "width": 1
                 },
                 "move": {
                     "enable": true,
-                    "speed": 2,
+                    "speed": 1,
                     "direction": "none",
                     "random": false,
                     "straight": false,
@@ -406,7 +401,7 @@
                     "grab": {
                         "distance": 140,
                         "line_linked": {
-                            "opacity": 1
+                            "opacity": 0.5
                         }
                     },
                     "bubble": {
@@ -441,7 +436,7 @@
         }).addTo(map);
         
         // Custom marker icon
-        const redIcon = L.divIcon({
+        const whiteIcon = L.divIcon({
             className: 'custom-pin',
             html: `<svg width="30" height="40" viewBox="0 0 30 40">
                 <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -451,8 +446,8 @@
                         <feMergeNode in="SourceGraphic"/>
                     </feMerge>
                 </filter>
-                <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 15 25 15 25s15-16.716 15-25c0-8.284-6.716-15-15-15z" fill="#ff2a2a" filter="url(#glow)"/>
-                <circle cx="15" cy="15" r="7" fill="white" opacity="0.6"/>
+                <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 15 25 15 25s15-16.716 15-25c0-8.284-6.716-15-15-15z" fill="#ffffff" filter="url(#glow)"/>
+                <circle cx="15" cy="15" r="7" fill="black" opacity="0.6"/>
             </svg>`,
             iconSize: [30, 40],
             iconAnchor: [15, 40]
@@ -487,7 +482,7 @@
                 if (value !== '--') {
                     navigator.clipboard.writeText(value)
                         .then(() => {
-                            showToast(`Copied to clipboard: ${value}`);
+                            showToast(`Copied to clipboard`);
                         })
                         .catch(err => {
                             showToast('Failed to copy text');
@@ -509,71 +504,35 @@
             const query = document.getElementById('search-input').value.trim();
             
             if (!query) {
-                showToast('Please enter an IP address or location');
+                showToast('Please enter an IP address');
+                return;
+            }
+            
+            // Validate IP address format
+            const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(query);
+            
+            if (!isIP) {
+                showToast('Please enter a valid IP address');
                 return;
             }
             
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
             
-            // Determine if input is IP address or location name
-            const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(query);
-            
-            if (isIP) {
-                fetchIPInfo(query);
-            } else {
-                fetchLocationInfo(query);
-            }
+            fetchIPInfo(query);
         }
         
         function fetchIPInfo(ip) {
             fetch(`https://ipapi.co/${ip}/json/`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        throw new Error(data.reason || 'Invalid IP address');
+                        throw new Error('Invalid IP address');
                     }
                     updateUI(data);
                 })
                 .catch(error => {
-                    showToast(`Error: ${error.message}`);
-                    document.getElementById('loading').style.display = 'none';
-                });
-        }
-        
-        function fetchLocationInfo(location) {
-            // Using OpenCage Geocoding API
-            const apiKey = 'c763f8c9e7e9425c8a9a4a3cdb3d5d6d'; // Free API key with limited requests
-            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.results && data.results.length > 0) {
-                        const result = data.results[0];
-                        const locationData = {
-                            city: result.components.city || result.components.town || result.components.village || '--',
-                            country: result.components.country || '--',
-                            region: result.components.state || result.components.county || '--',
-                            timezone: result.annotations?.timezone?.name || '--',
-                            latitude: result.geometry.lat,
-                            longitude: result.geometry.lng
-                        };
-                        updateUI(locationData);
-                    } else {
-                        throw new Error('Location not found');
-                    }
-                })
-                .catch(error => {
-                    showToast(`Error: ${error.message}`);
+                    showToast('Unable to locate IP address');
                     document.getElementById('loading').style.display = 'none';
                 });
         }
@@ -605,13 +564,13 @@
             }
             
             map.setView([lat, lng], 10);
-            marker = L.marker([lat, lng], {icon: redIcon}).addTo(map);
+            marker = L.marker([lat, lng], {icon: whiteIcon}).addTo(map);
             
             // Add a pulsing circle
             const pulseCircle = L.circle([lat, lng], {
-                color: '#ff2a2a',
-                fillColor: '#ff2a2a',
-                fillOpacity: 0.3,
+                color: '#ffffff',
+                fillColor: '#ffffff',
+                fillOpacity: 0.2,
                 radius: 0
             }).addTo(map);
             
@@ -622,7 +581,7 @@
                 radius += 1000;
                 pulseCircle.setRadius(radius);
                 pulseCircle.setStyle({
-                    fillOpacity: 0.3 * (1 - radius / maxRadius)
+                    fillOpacity: 0.2 * (1 - radius / maxRadius)
                 });
                 
                 if (radius >= maxRadius) {
@@ -649,20 +608,20 @@
             // Convert lat/lng to pixel coordinates on the map
             const point = map.latLngToContainerPoint([lat, lng]);
             
-            // Create 30 particles that will swarm to the pin
-            for (let i = 0; i < 30; i++) {
+            // Create 20 particles that will swarm to the pin
+            for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'swarm-particle';
                 particle.style.cssText = `
                     position: absolute;
-                    width: 5px;
-                    height: 5px;
-                    background-color: #ff2a2a;
+                    width: 4px;
+                    height: 4px;
+                    background-color: #ffffff;
                     border-radius: 50%;
-                    box-shadow: 0 0 5px rgba(255, 42, 42, 0.7);
+                    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
                     z-index: 1000;
                     pointer-events: none;
-                    opacity: 0.7;
+                    opacity: 0.5;
                 `;
                 
                 // Random starting position
@@ -694,9 +653,9 @@
             }
         }
         
-        // Initial demo location (New York)
+        // Initial demo with localhost IP
         setTimeout(() => {
-            document.getElementById('search-input').value = 'New York';
+            document.getElementById('search-input').value = '127.0.0.1';
             performSearch();
         }, 1000);
     </script>

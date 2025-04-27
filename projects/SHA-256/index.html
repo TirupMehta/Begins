@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHA-256 Encoder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #000000;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .cursor {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+    }
+
+    .cursor::after {
+      content: "";
+      width: 4px;
+      height: 4px;
+      position: absolute;
+      background-color: #ffffff;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+    }
+
+    .hash-btn:hover ~ .cursor,
+    .copy-btn:hover ~ .cursor {
+      width: 30px;
+      height: 30px;
+      border-color: #ff5555;
+      background: rgba(255, 85, 85, 0.2);
+    }
+
+    .hash-btn:hover ~ .cursor::after,
+    .copy-btn:hover ~ .cursor::after {
+      background-color: #ff5555;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .container {
+      text-align: center;
+      padding: 3rem;
+      border-radius: 1rem;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 1s ease-out;
+      max-width: 500px;
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 48px rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(45deg, #333333, #666666);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.5rem;
+      color: #ffffff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 0.5s forwards;
+    }
+
+    .input-field:focus {
+      border-color: #ff5555;
+    }
+
+    .hash-btn, .copy-btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      color: #000000;
+      background: linear-gradient(45deg, #cccccc, #ffffff);
+      border: none;
+      border-radius: 2rem;
+      cursor: none;
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 1s forwards;
+      margin: 0.5rem;
+    }
+
+    .hash-btn:hover, .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .hash-btn:active, .copy-btn:active {
+      transform: translateY(0);
+    }
+
+    .hash-output {
+      font-size: 1.2rem;
+      margin: 1.5rem 0;
+      word-break: break-all;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 1.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333333;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 2rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor"></div>
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <h1>SHA-256</h1>
+    <input type="text" class="input-field" id="inputText" placeholder="Enter text to hash...">
+    <button class="hash-btn" onclick="generateHash()">Generate SHA-256</button>
+    <div class="hash-output" id="hashOutput">Hash will appear here...</div>
+    <button class="copy-btn" onclick="copyToClipboard()">Copy Hash</button>
+    <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 1rem;">Encrypt your story, leave no trace.</p>
+  </div>
+
+  <div id="toast" class="toast">Hash copied to clipboard!</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    const cursor = document.querySelector('.cursor');
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Smooth cursor movement
+    function updateCursor(e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      requestAnimationFrame(() => {
+        cursor.style.left = `${mouseX}px`;
+        cursor.style.top = `${mouseY}px`;
+      });
+    }
+
+    document.addEventListener('mousemove', updateCursor);
+
+    // Particles.js configuration
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+        size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 0.1, sync: false } },
+        line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+        move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+      },
+      retina_detect: true
+    });
+
+    // Generate SHA-256 hash
+    async function generateHash() {
+      const inputText = document.getElementById('inputText').value;
+      if (!inputText) {
+        document.getElementById('hashOutput').textContent = "Please enter text to hash.";
+        return;
+      }
+      try {
+        const msgBuffer = new TextEncoder().encode(inputText);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        document.getElementById('hashOutput').textContent = hashHex;
+        pulseParticles();
+      } catch (error) {
+        console.error("Failed to generate hash:", error);
+        document.getElementById('hashOutput').textContent = "Failed to generate hash.";
+      }
+    }
+
+    // Copy to clipboard
+    function copyToClipboard() {
+      const hashOutput = document.getElementById('hashOutput').textContent;
+      if (hashOutput === "Hash will appear here..." || hashOutput.includes("Failed")) return;
+      navigator.clipboard.writeText(hashOutput).then(() => {
+        showToast();
+      });
+    }
+
+    // Show toast notification
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Pulse particles on hash generation
+    function pulseParticles() {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: "#ff5555" }, // Red for dark romance
+          shape: { type: "circle" },
+          opacity: { value: 0.8, random: true, anim: { enable: true, speed: 2, opacity_min: 0.2, sync: false } },
+          size: { value: 4, random: true, anim: { enable: true, speed: 3, size_min: 0.2, sync: false } },
+          line_linked: { enable: true, distance: 150, color: "#ff5555", opacity: 0.6, width: 1 },
+          move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+          modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+        },
+        retina_detect: true
+      });
+      setTimeout(() => {
+        particlesJS('particles-js', {
+          particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: "#ffffff" },
+            shape: { type: "circle" },
+            opacity: { value: 0.5, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+            size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 0.1, sync: false } },
+            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+            move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+          },
+          interactivity: {
+            detect_on: "canvas",
+            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+            modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+          },
+          retina_detect: true
+        });
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

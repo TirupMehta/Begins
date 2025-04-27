@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Marker | Finding You in the Void</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --accent: #ff2a2a;
+            --accent-glow: rgba(255, 42, 42, 0.5);
+            --text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--darker-bg);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 42, 42, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+        
+        .tagline {
+            text-align: center;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: var(--secondary-text);
+            font-size: 1.2rem;
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        
+        #search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 42, 42, 0.2);
+            border-right: none;
+        }
+        
+        #search-input:focus {
+            outline: none;
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+        
+        #search-btn {
+            padding: 12px 20px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #search-btn:hover {
+            background-color: #ff4444;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-panel {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 42, 42, 0.2);
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-title::before {
+            content: ">";
+            color: var(--accent);
+        }
+        
+        .info-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-label {
+            color: var(--secondary-text);
+        }
+        
+        .info-value {
+            color: var(--text);
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            color: #ff4444;
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+        
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 42, 42, 0.2);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 42, 42, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .cursor-blip {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgba(255, 42, 42, 0.5);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            box-shadow: 0 0 10px var(--accent-glow);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.7;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="cursor-blip"></div>
+    
+    <div class="container">
+        <h1>GEO MARKER</h1>
+        <p class="tagline">No distance can hide you from me. Finding you in the void.</p>
+        
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Enter IP address or location...">
+            <button id="search-btn">LOCATE</button>
+        </div>
+        
+        <div class="loading" id="loading">Searching the void...</div>
+        
+        <div id="map"></div>
+        
+        <div class="results">
+            <div class="info-panel">
+                <div class="info-title">Location Data</div>
+                <div class="info-item">
+                    <span class="info-label">City:</span>
+                    <span class="info-value" id="city">--</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Country:</span>
+                    <span class="info-value" id="country">--</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Region:</span>
+                    <span class="info-value" id="region">--</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Timezone:</span>
+                    <span class="info-value" id="timezone">--</span>
+                </div>
+            </div>
+            
+            <div class="info-panel">
+                <div class="info-title">Coordinates</div>
+                <div class="info-item">
+                    <span class="info-label">Latitude:</span>
+                    <span class="info-value" id="latitude">--</span>
+                    <button class="copy-btn" data-value="latitude">Copy</button>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Longitude:</span>
+                    <span class="info-value" id="longitude">--</span>
+                    <button class="copy-btn" data-value="longitude">Copy</button>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Full Coordinates:</span>
+                    <span class="info-value" id="coordinates">--</span>
+                    <button class="copy-btn" data-value="coordinates">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ff2a2a"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ff2a2a",
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Initialize map with dark style
+        let map = L.map('map').setView([0, 0], 2);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Custom marker icon
+        const redIcon = L.divIcon({
+            className: 'custom-pin',
+            html: `<svg width="30" height="40" viewBox="0 0 30 40">
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 15 25 15 25s15-16.716 15-25c0-8.284-6.716-15-15-15z" fill="#ff2a2a" filter="url(#glow)"/>
+                <circle cx="15" cy="15" r="7" fill="white" opacity="0.6"/>
+            </svg>`,
+            iconSize: [30, 40],
+            iconAnchor: [15, 40]
+        });
+        
+        let marker;
+        
+        // GPS blip cursor effect
+        document.addEventListener('mousemove', (e) => {
+            const cursorBlip = document.querySelector('.cursor-blip');
+            cursorBlip.style.left = `${e.clientX}px`;
+            cursorBlip.style.top = `${e.clientY}px`;
+        });
+        
+        // Toast notification
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+        
+        // Copy to clipboard functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const valueId = btn.getAttribute('data-value');
+                const value = document.getElementById(valueId).textContent;
+                
+                if (value !== '--') {
+                    navigator.clipboard.writeText(value)
+                        .then(() => {
+                            showToast(`Copied to clipboard: ${value}`);
+                        })
+                        .catch(err => {
+                            showToast('Failed to copy text');
+                            console.error('Could not copy text: ', err);
+                        });
+                }
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('search-btn').addEventListener('click', performSearch);
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            
+            if (!query) {
+                showToast('Please enter an IP address or location');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            // Determine if input is IP address or location name
+            const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(query);
+            
+            if (isIP) {
+                fetchIPInfo(query);
+            } else {
+                fetchLocationInfo(query);
+            }
+        }
+        
+        function fetchIPInfo(ip) {
+            fetch(`https://ipapi.co/${ip}/json/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.reason || 'Invalid IP address');
+                    }
+                    updateUI(data);
+                })
+                .catch(error => {
+                    showToast(`Error: ${error.message}`);
+                    document.getElementById('loading').style.display = 'none';
+                });
+        }
+        
+        function fetchLocationInfo(location) {
+            // Using OpenCage Geocoding API
+            const apiKey = 'c763f8c9e7e9425c8a9a4a3cdb3d5d6d'; // Free API key with limited requests
+            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.results && data.results.length > 0) {
+                        const result = data.results[0];
+                        const locationData = {
+                            city: result.components.city || result.components.town || result.components.village || '--',
+                            country: result.components.country || '--',
+                            region: result.components.state || result.components.county || '--',
+                            timezone: result.annotations?.timezone?.name || '--',
+                            latitude: result.geometry.lat,
+                            longitude: result.geometry.lng
+                        };
+                        updateUI(locationData);
+                    } else {
+                        throw new Error('Location not found');
+                    }
+                })
+                .catch(error => {
+                    showToast(`Error: ${error.message}`);
+                    document.getElementById('loading').style.display = 'none';
+                });
+        }
+        
+        function updateUI(data) {
+            document.getElementById('city').textContent = data.city || '--';
+            document.getElementById('country').textContent = data.country_name || data.country || '--';
+            document.getElementById('region').textContent = data.region || data.region_name || '--';
+            document.getElementById('timezone').textContent = data.timezone || '--';
+            
+            const lat = data.latitude;
+            const lng = data.longitude;
+            
+            document.getElementById('latitude').textContent = lat || '--';
+            document.getElementById('longitude').textContent = lng || '--';
+            document.getElementById('coordinates').textContent = lat && lng ? `${lat}, ${lng}` : '--';
+            
+            if (lat && lng) {
+                updateMap(lat, lng);
+                animateParticlesToPin(lat, lng);
+            }
+            
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        function updateMap(lat, lng) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            
+            map.setView([lat, lng], 10);
+            marker = L.marker([lat, lng], {icon: redIcon}).addTo(map);
+            
+            // Add a pulsing circle
+            const pulseCircle = L.circle([lat, lng], {
+                color: '#ff2a2a',
+                fillColor: '#ff2a2a',
+                fillOpacity: 0.3,
+                radius: 0
+            }).addTo(map);
+            
+            // Animate the circle
+            let radius = 0;
+            const maxRadius = 50000; // 50km
+            const pulseInterval = setInterval(() => {
+                radius += 1000;
+                pulseCircle.setRadius(radius);
+                pulseCircle.setStyle({
+                    fillOpacity: 0.3 * (1 - radius / maxRadius)
+                });
+                
+                if (radius >= maxRadius) {
+                    radius = 0;
+                }
+            }, 50);
+            
+            // Clear interval when map is moved
+            map.once('movestart', () => {
+                clearInterval(pulseInterval);
+                map.removeLayer(pulseCircle);
+            });
+        }
+        
+        function animateParticlesToPin(lat, lng) {
+            // This is a simplified version - in a real implementation,
+            // you would need to modify particles.js configuration dynamically
+            // or use a different particle library that allows more control
+            
+            // For now, we'll just add a visual effect to simulate particles swarming
+            const mapContainer = document.getElementById('map');
+            const mapRect = mapContainer.getBoundingClientRect();
+            
+            // Convert lat/lng to pixel coordinates on the map
+            const point = map.latLngToContainerPoint([lat, lng]);
+            
+            // Create 30 particles that will swarm to the pin
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'swarm-particle';
+                particle.style.cssText = `
+                    position: absolute;
+                    width: 5px;
+                    height: 5px;
+                    background-color: #ff2a2a;
+                    border-radius: 50%;
+                    box-shadow: 0 0 5px rgba(255, 42, 42, 0.7);
+                    z-index: 1000;
+                    pointer-events: none;
+                    opacity: 0.7;
+                `;
+                
+                // Random starting position
+                const startX = Math.random() * mapRect.width;
+                const startY = Math.random() * mapRect.height;
+                
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                
+                mapContainer.appendChild(particle);
+                
+                // Animate to target
+                const delay = Math.random() * 1000;
+                const duration = 1000 + Math.random() * 2000;
+                
+                setTimeout(() => {
+                    particle.style.transition = `all ${duration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+                    particle.style.left = `${point.x}px`;
+                    particle.style.top = `${point.y}px`;
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        particle.style.opacity = '0';
+                        setTimeout(() => {
+                            mapContainer.removeChild(particle);
+                        }, 500);
+                    }, duration);
+                }, delay);
+            }
+        }
+        
+        // Initial demo location (New York)
+        setTimeout(() => {
+            document.getElementById('search-input').value = 'New York';
+            performSearch();
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PBQJ7ZV5VN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PBQJ7ZV5VN');
+</script>
+<meta name='probely-verification' content='570d2763-252e-49d8-898d-4ad13b2d926f' /> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheckmateBegins</title>
+<meta name="description" content="Explore free cybersecurity resources with CheckmateBegins. Access data, courses, and tools to enhance your knowledge.">
+<link rel="icon" type="image/png" href="title.png">
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-color: #000000;
+        --text-color: #ffffff;
+        --accent-color: #111111;
+        --highlight-color: #1a1a1a;
+        --gray-400: #a3a3a3;
+        --gray-500: #737373;
+        --transition-duration: 0.3s;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
+    .container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 5%; }
+    
+    /* Noise overlay */
+    .noise {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 9998;
+    }
+    
+    header {
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+        height: 80px;
+    }
+    .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--text-color);
+        text-decoration: none;
+        letter-spacing: -1px;
+    }
+    .nav-links {
+        display: flex;
+        list-style: none;
+        align-items: center;
+    }
+    .nav-links li { margin-left: 2.5rem; }
+    .nav-links a {
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        padding: 5px 0;
+        font-weight: 500;
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .nav-links a::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--text-color);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-links a:hover::before {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+    .menu-toggle { 
+        display: none; 
+        cursor: pointer; 
+        width: 30px;
+        height: 20px;
+        position: relative;
+        z-index: 2;
+    }
+    .menu-toggle span {
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: var(--text-color);
+        position: absolute;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .menu-toggle span:nth-child(1) { top: 0; }
+    .menu-toggle span:nth-child(2) { top: 9px; }
+    .menu-toggle span:nth-child(3) { top: 18px; }
+    .menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg);
+        top: 9px;
+    }
+    .menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg);
+        top: 9px;
+    }
+    
+    .hero {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    .hero-content { 
+        max-width: 900px; 
+        padding: 0 5%; 
+        position: relative;
+        z-index: 1;
+    }
+    .hero h1 { 
+        font-size: 5rem; 
+        margin-bottom: 1.5rem; 
+        font-weight: 700;
+        letter-spacing: -2px;
+        line-height: 1.1;
+    }
+    .hero p { 
+        font-size: 1.5rem; 
+        margin-bottom: 2rem;
+        font-weight: 300;
+    }
+    
+    .button {
+        display: inline-block;
+        padding: 16px 40px;
+        background-color: transparent;
+        color: var(--text-color);
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-top: 2rem;
+        font-size: 1rem;
+        position: relative;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    .button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background-color: var(--text-color);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: -1;
+    }
+    .button:hover {
+        color: var(--bg-color);
+    }
+    .button:hover::before {
+        width: 100%;
+    }
+    
+    .resources-list {
+        padding: 10rem 0;
+        position: relative;
+        z-index: 1;
+    }
+    .section-header {
+        margin-bottom: 6rem;
+        position: relative;
+    }
+    .section-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        letter-spacing: -1px;
+        margin-bottom: 1.5rem;
+    }
+    .section-line {
+        width: 100px;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.2);
+        margin-bottom: 1.5rem;
+    }
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 3rem;
+    }
+    .resource-card {
+        background-color: var(--accent-color);
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: transform 0.5s ease, box-shadow 0.5s ease;
+    }
+    .resource-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .resource-card-number {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 4rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.03);
+        line-height: 1;
+    }
+    .resource-card h3 { 
+        font-size: 1.5rem; 
+        margin-bottom: 1.5rem; 
+        position: relative;
+        font-weight: 600;
+    }
+    .resource-card p { 
+        margin-bottom: 2rem; 
+        font-size: 1rem;
+        color: var(--gray-400);
+        line-height: 1.8;
+    }
+    .resource-card a {
+        color: var(--text-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        display: inline-block;
+        padding: 5px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+    }
+    .resource-card a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--text-color);
+        transform: scaleX(0.3);
+        transform-origin: left;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .resource-card a:hover::after {
+        transform: scaleX(1);
+    }
+    
+    footer {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        text-align: center;
+        padding: 5rem 0;
+        position: relative;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    footer p {
+        color: var(--gray-500);
+        font-size: 0.9rem;
+    }
+    
+    /* Canvas animation */
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+    
+    /* Scroll indicator */
+    .scroll-indicator {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    .scroll-indicator svg {
+        width: 100%;
+        height: 100%;
+    }
+    .scroll-indicator circle {
+        fill: none;
+        stroke: white;
+        stroke-width: 2;
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        transform-origin: center;
+        transform: rotate(-90deg);
+    }
+    
+    @media screen and (max-width: 1200px) {
+        .hero h1 { font-size: 4rem; }
+        .section-title { font-size: 3rem; }
+    }
+    
+    @media screen and (max-width: 768px) {
+        .nav-links {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            padding: 120px 5% 2rem;
+            z-index: 1;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nav-links.active { 
+            display: flex; 
+            opacity: 1;
+        }
+        .nav-links li { margin: 1.5rem 0; }
+        .nav-links.active li {
+            opacity: 1;
+        }
+        .nav-links a {
+            font-size: 1.5rem;
+        }
+        .menu-toggle { display: block; }
+        .hero h1 { font-size: 3rem; }
+        .hero p { font-size: 1.1rem; }
+        .section-title { font-size: 2.5rem; }
+        .resources-grid {
+            grid-template-columns: 1fr;
+        }
+        .resource-card {
+            padding: 2rem;
+        }
+        .scroll-indicator {
+            bottom: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+        }
+    }
+</style>
+</head>
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KB5G7VFK"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <!-- Noise overlay -->
+    <div class="noise"></div>
+    
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" id="scroll-circle" />
+        </svg>
+    </div>
+
+    <header>
+        <nav class="container">
+            <a href="https://begins.site" class="logo">CheckmateBegins</a>
+            <ul class="nav-links">
+                <li><a href="about.html">About</a></li>
+                <li><a href="/blog">Blogs</a></li>
+                <li><a href="visitorip.html">Your IP</a></li>
+                <li><a href="StartCrypt.html">Encrypt</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <canvas id="hero-canvas"></canvas>
+            <div class="hero-content">
+                <h1>Checkmate Begins</h1>
+                <p>Your go-to resource for free cybersecurity data, courses, and tools</p>
+                <a href="#resources-list" class="button" id="explore-resources">Explore Resources</a>
+            </div>
+        </section>
+
+        <section id="resources-list" class="resources-list">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Our Resources</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <div class="resource-card-number">01</div>
+                        <h3>Cybersecurity Data</h3>
+                        <p>Access our comprehensive database of cybersecurity information, including threat intelligence and vulnerability data.</p>
+                        <a href="https://t.me/directeverything">Explore Data</a>
+                    </div>
+                    <div class="resource-card">
+                        <div class="resource-card-number">02</div>
+                        <h3>Your IP Address</h3>
+                        <p>Check your current IP address and learn about its implications for your online privacy and security.</p>
+                        <a href="visitorip.html">Check IP</a>
+                    </div>
+                    <div class="resource-card">
+                        <div class="resource-card-number">03</div>
+                        <h3>Encryption & Decryption Tool</h3>
+                        <p>Use our latest copyrighted tool to securely encrypt and decrypt your sensitive information.</p>
+                        <a href="StartCrypt.html">Try the Tool</a>
+                    </div>
+                    <div class="resource-card">
+                        <div class="resource-card-number">04</div>
+                        <h3>Developed Projects</h3>
+                        <p>Explore our latest web pages and tools developed by us. Be the first to test and provide feedback on our newest cybersecurity innovations.</p>
+                        <a href="/projects">View Projects</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 CheckmateBegins. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Canvas animation
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            
+            // Resize canvas on window resize
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+            
+            // Particle class
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = Math.random() * 0.5 - 0.25;
+                    this.speedY = Math.random() * 0.5 - 0.25;
+                    this.opacity = Math.random() * 0.5 + 0.2;
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    
+                    if (this.x < 0 || this.x > width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > height) this.speedY *= -1;
+                }
+                
+                draw() {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Create particles
+            const particles = [];
+            const particleCount = Math.min(width, height) * 0.05;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+            
+            // Draw lines between particles
+            function drawLines() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 * (1 - distance / 100)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                
+                drawLines();
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            // Menu toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+            
+            // Scroll animations
+            const header = document.querySelector('header');
+            const scrollCircle = document.getElementById('scroll-circle');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            
+            function handleScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollProgress = scrollTop / docHeight;
+                
+                // Header effect
+                header.style.backgroundColor = scrollTop > 50 ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.7)';
+                
+                // Scroll indicator
+                if (scrollTop > 100) {
+                    scrollIndicator.style.opacity = '1';
+                    const dashOffset = 283 - (283 * scrollProgress);
+                    scrollCircle.style.strokeDashoffset = dashOffset;
+                } else {
+                    scrollIndicator.style.opacity = '0';
+                }
+            }
+            
+            window.addEventListener('scroll', handleScroll);
+            
+            // Smooth scroll to resources section
+            const exploreButton = document.getElementById('explore-resources');
+            
+            exploreButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                const resourcesSection = document.getElementById('resources-list');
+                resourcesSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Initialize
+            handleScroll();
+        });
+    </script>
+</body>
+</html>

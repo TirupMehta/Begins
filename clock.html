@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Flip Clock</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #121212;
+            --bg-gradient-end: #1e1e1e;
+            --container-bg: rgba(30, 30, 30, 0.7);
+            --container-shadow: rgba(0, 0, 0, 0.6);
+            --card-bg: #2a2a2a;
+            --card-gradient-start: #333333;
+            --card-gradient-end: #222222;
+            --card-shadow: rgba(0, 0, 0, 0.6);
+            --text-color: #ffffff;
+            --secondary-text: #cccccc;
+            --accent-color: #555555;
+            --button-bg: rgba(60, 60, 60, 0.8);
+            --button-hover: rgba(80, 80, 80, 0.9);
+            --button-active: rgba(100, 100, 100, 1);
+            --divider-color: rgba(0, 0, 0, 0.4);
+            --tooltip-bg: rgba(80, 80, 80, 0.95);
+            --tooltip-text: #fff;
+            --slider-bg: #444;
+            --slider-checked-bg: #666;
+            --slider-knob: white;
+        }
+
+        html.light-theme {
+            --bg-color: #f5f5f5;
+            --bg-gradient-end: #e8e8e8;
+            --container-bg: rgba(255, 255, 255, 0.8);
+            --container-shadow: rgba(0, 0, 0, 0.15);
+            --card-bg: #ffffff;
+            --card-gradient-start: #ffffff;
+            --card-gradient-end: #f0f0f0;
+            --card-shadow: rgba(0, 0, 0, 0.2);
+            --text-color: #333333;
+            --secondary-text: #555555;
+            --accent-color: #e0e0e0;
+            --button-bg: rgba(220, 220, 220, 0.8);
+            --button-hover: rgba(200, 200, 200, 0.9);
+            --button-active: rgba(180, 180, 180, 1);
+            --divider-color: rgba(0, 0, 0, 0.1);
+            --tooltip-bg: rgba(100, 100, 100, 0.95);
+            --tooltip-text: #fff;
+            --slider-bg: #ddd;
+            --slider-checked-bg: #ccc;
+            --slider-knob: #555;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 0.5s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-align: center;
+        }
+
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            padding: 30px;
+            border-radius: 24px;
+            background: var(--container-bg);
+            box-shadow: 0 20px 40px var(--container-shadow);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            width: auto;
+            max-width: 95%;
+        }
+
+        .flip-clock {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .time-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cards-row {
+             display: flex;
+             gap: 6px;
+        }
+
+        .time-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--secondary-text);
+            text-align: center;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .ampm {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-color);
+            background: var(--accent-color);
+            padding: 5px 10px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            transition: opacity 0.3s ease, background 0.3s ease, color 0.3s ease;
+        }
+
+        .ampm.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .flip-card {
+            position: relative;
+            width: 80px;
+            height: 120px;
+            perspective: 1000px;
+        }
+
+        @media (max-width: 768px) {
+             .flip-clock { gap: 8px; }
+            .flip-card {
+                width: 60px;
+                height: 90px;
+            }
+             .flip-card-front span, .flip-card-back span { font-size: 60px; }
+             .colon { font-size: 40px; margin: 0 1px; }
+             .date-display { font-size: 20px; letter-spacing: 3px; }
+             .ampm { top: -25px; font-size: 14px; }
+        }
+
+        @media (max-width: 480px) {
+             .flip-clock { gap: 5px; }
+            .flip-card {
+                width: 40px;
+                height: 60px;
+            }
+            .flip-card-front span, .flip-card-back span { font-size: 35px; }
+            .colon { font-size: 25px; margin: 0 0px; }
+            .date-display { font-size: 16px; letter-spacing: 2px; padding: 8px 15px; }
+            .ampm { top: -20px; font-size: 12px; padding: 3px 6px; }
+            .time-label { font-size: 10px; letter-spacing: 1px; }
+            .controls { gap: 10px; }
+            .btn { padding: 8px 12px; font-size: 12px; }
+            .btn-icon { width: 14px; height: 14px; }
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 20px var(--card-shadow);
+            border-radius: 12px;
+            background-color: var(--card-bg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+            font-weight: bold;
+            color: var(--text-color);
+            background: linear-gradient(to bottom, var(--card-gradient-start) 0%, var(--card-gradient-end) 100%);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .flip-card-back {
+            transform: rotateX(180deg);
+        }
+
+        .flip-card.flip .flip-card-inner {
+            transform: rotateX(180deg);
+        }
+
+        .divider {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--divider-color);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .colon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-weight: bold;
+            margin: 0 2px;
+            color: var(--text-color);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            align-self: center;
+            padding-bottom: 20px;
+        }
+
+        .date-display {
+            font-size: 24px;
+            letter-spacing: 5px;
+            margin-top: 10px;
+            color: var(--secondary-text);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(40, 40, 40, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            text-align: center; 
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            flex-shrink: 0;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 180px; /* Fixed width for consistent button sizing */
+        }
+
+        .btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.active {
+            background-color: var(--button-active);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        body.fullscreen-active .clock-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            border-radius: 0;
+            background: var(--bg-color);
+            backdrop-filter: none;
+            box-shadow: none;
+            max-width: 100%;
+        }
+
+        body.fullscreen-active .flip-clock {
+            transform: scale(1.5);
+            margin-bottom: 40px;
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        body.fullscreen-active .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+        }
+
+        .theme-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--secondary-text);
+            text-align: center; 
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--button-bg);
+            padding: 8px 16px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--slider-bg);
+            transition: .4s;
+            border-radius: 28px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--slider-knob);
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--slider-checked-bg);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(28px);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 160px;
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            text-align: center;
+            border-radius: 8px;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            pointer-events: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .tooltip:hover .tooltiptext,
+        .tooltip:focus .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .keyboard-shortcut {
+            font-size: 11px;
+            color: var(--secondary-text);
+            margin-left: 5px;
+            background: rgba(0,0,0,0.15);
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Animation refinements */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .colon {
+            animation: pulse 1s infinite ease-in-out;
+        }
+
+        .flip-card-inner {
+            box-shadow: 0 10px 20px var(--card-shadow), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .flip-card.flip .flip-card-inner {
+            box-shadow: 0 15px 25px var(--card-shadow), 0 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container" id="main-clock">
+        <div class="flip-clock">
+            <div class="ampm" id="ampm">AM</div>
+
+            <!-- Hours -->
+            <div class="time-section">
+                 <div class="cards-row">
+                    <div class="flip-card" id="hour-tens" data-unit="hourTens">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" id="hour-ones" data-unit="hourOnes">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+                <div class="time-label">Hours</div>
+            </div>
+
+            <div class="colon">:</div>
+
+            <!-- Minutes -->
+            <div class="time-section">
+                 <div class="cards-row">
+                    <div class="flip-card" id="minute-tens" data-unit="minuteTens">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" id="minute-ones" data-unit="minuteOnes">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+                <div class="time-label">Minutes</div>
+            </div>
+
+            <div class="colon">:</div>
+
+            <!-- Seconds -->
+            <div class="time-section">
+                 <div class="cards-row">
+                    <div class="flip-card" id="second-tens" data-unit="secondTens">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card" id="second-ones" data-unit="secondOnes">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="divider"></div>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+                <div class="time-label">Seconds</div>
+            </div>
+        </div>
+
+        <div class="date-display" id="date-display">MON JAN 01</div>
+
+        <div class="controls">
+            <div class="control-row">
+                <button class="btn tooltip" id="format-btn" aria-label="Toggle time format">
+
+                    <span class="btn-text">Time Format</span>
+                    <span class="keyboard-shortcut">F</span>
+                    <span class="tooltiptext">Toggle 12/24 hour format</span>
+                </button>
+
+                <button class="btn tooltip" id="fullscreen-btn" aria-label="Toggle fullscreen">
+
+                    <span class="btn-text">Fullscreen</span>
+                    <span class="keyboard-shortcut">S</span>
+                    <span class="tooltiptext">Enter/Exit fullscreen mode</span>
+                </button>
+            </div>
+
+            <div class="control-row">
+                <div class="theme-switch-container tooltip">
+                    <span class="tooltiptext">Toggle dark/light theme</span>
+                    <span>Dark</span>
+                    <label class="theme-switch" aria-label="Theme toggle">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Light</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DOM Elements ---
+            const elements = {
+                hourTens: document.getElementById('hour-tens'),
+                hourOnes: document.getElementById('hour-ones'),
+                minuteTens: document.getElementById('minute-tens'),
+                minuteOnes: document.getElementById('minute-ones'),
+                secondTens: document.getElementById('second-tens'),
+                secondOnes: document.getElementById('second-ones'),
+                ampmDisplay: document.getElementById('ampm'),
+                dateDisplay: document.getElementById('date-display'),
+                formatBtn: document.getElementById('format-btn'),
+                formatBtnText: document.querySelector('#format-btn .btn-text'),
+                fullscreenBtn: document.getElementById('fullscreen-btn'),
+                fullscreenBtnText: document.querySelector('#fullscreen-btn .btn-text'),
+                themeToggle: document.getElementById('theme-toggle'),
+                mainClock: document.getElementById('main-clock'),
+                htmlElement: document.documentElement,
+                bodyElement: document.body
+            };
+
+            // --- State Variables ---
+            const state = {
+                is24HourFormat: false,
+                isFullscreen: false,
+                isLightTheme: false,
+                timeoutId: null,
+                prevTime: {
+                    hourTens: -1, hourOnes: -1,
+                    minuteTens: -1, minuteOnes: -1,
+                    secondTens: -1, secondOnes: -1,
+                    ampm: '', dateStr: ''
+                },
+                // Cache flip card elements for performance
+                flipCards: {}
+            };
+
+            // Cache flip card front/back spans
+            document.querySelectorAll('.flip-card').forEach(card => {
+                const unit = card.dataset.unit; // Use data-unit attribute
+                if (unit) {
+                    state.flipCards[unit] = {
+                        element: card,
+                        frontSpan: card.querySelector('.flip-card-front span'),
+                        backSpan: card.querySelector('.flip-card-back span')
+                    };
+                }
+            });
+
+            // --- Constants ---
+            const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const FLIP_DURATION = 600; // ms, should match CSS transition
+
+            // --- Functions ---
+            function updateFlipCard(unit, newValue) {
+                const cardData = state.flipCards[unit];
+                const prevValue = state.prevTime[unit];
+
+                if (cardData && newValue !== prevValue) {
+                    // Update the back face with new value
+                    cardData.backSpan.textContent = newValue;
+
+                    // Add flip class to trigger animation
+                    cardData.element.classList.add('flip');
+
+                    // After animation completes, update front face and remove flip class
+                    setTimeout(() => {
+                        cardData.frontSpan.textContent = newValue;
+                        cardData.element.classList.remove('flip');
+                    }, FLIP_DURATION);
+
+                    // Update previous value in state
+                    state.prevTime[unit] = newValue;
+                }
+            }
+
+            function updateClock() {
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+
+                // AM/PM and 12/24 hour format
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                let displayHours = hours;
+
+                if (!state.is24HourFormat) {
+                    displayHours = hours % 12;
+                    displayHours = displayHours ? displayHours : 12; // Hour '0' should be '12'
+                    elements.ampmDisplay.classList.remove('hidden');
+                    if (ampm !== state.prevTime.ampm) {
+                        elements.ampmDisplay.textContent = ampm;
+                        state.prevTime.ampm = ampm;
+                    }
+                } else {
+                    elements.ampmDisplay.classList.add('hidden');
+                    if (state.prevTime.ampm !== '24H') { // Update only once when switching to 24h
+                        state.prevTime.ampm = '24H';
+                    }
+                }
+
+                // Format time values with padding
+                const hourTensVal = String(Math.floor(displayHours / 10));
+                const hourOnesVal = String(displayHours % 10);
+                const minuteTensVal = String(Math.floor(minutes / 10));
+                const minuteOnesVal = String(minutes % 10);
+                const secondTensVal = String(Math.floor(seconds / 10));
+                const secondOnesVal = String(seconds % 10);
+
+                // Update Date Display
+                const dayName = DAYS[now.getDay()];
+                const monthName = MONTHS[now.getMonth()];
+                const dateNum = String(now.getDate()).padStart(2, '0');
+                const dateStr = `${dayName} ${monthName} ${dateNum}`;
+
+                if (dateStr !== state.prevTime.dateStr) {
+                    elements.dateDisplay.textContent = dateStr;
+                    state.prevTime.dateStr = dateStr;
+                }
+
+                // Update Flip Cards using cached elements
+                updateFlipCard('hourTens', hourTensVal);
+                updateFlipCard('hourOnes', hourOnesVal);
+                updateFlipCard('minuteTens', minuteTensVal);
+                updateFlipCard('minuteOnes', minuteOnesVal);
+                updateFlipCard('secondTens', secondTensVal);
+                updateFlipCard('secondOnes', secondOnesVal);
+
+                // Schedule next update precisely at the next second
+                const msUntilNextSecond = 1000 - now.getMilliseconds();
+                clearTimeout(state.timeoutId); // Clear any existing timeout to prevent multiple timers
+                state.timeoutId = setTimeout(updateClock, msUntilNextSecond);
+            }
+
+            function toggleTimeFormat() {
+                state.is24HourFormat = !state.is24HourFormat;
+                elements.formatBtnText.textContent = state.is24HourFormat ? "24-Hour" : "12-Hour";
+                // Clear previous time to force immediate update of AM/PM and hours
+                state.prevTime.ampm = '';
+                state.prevTime.hourTens = -1;
+                state.prevTime.hourOnes = -1;
+                clearTimeout(state.timeoutId); // Clear existing timeout
+                updateClock(); // Update immediately
+            }
+
+            async function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    try {
+                        await document.documentElement.requestFullscreen();
+                        elements.bodyElement.classList.add('fullscreen-active');
+                        elements.fullscreenBtnText.textContent = 'Exit';
+                        state.isFullscreen = true;
+                    } catch (err) {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                        alert('Fullscreen mode could not be activated.');
+                    }
+                } else {
+                    try {
+                        await document.exitFullscreen();
+                        elements.bodyElement.classList.remove('fullscreen-active');
+                        elements.fullscreenBtnText.textContent = 'Fullscreen';
+                        state.isFullscreen = false;
+                    } catch (err) {
+                        console.error(`Error attempting to exit full-screen mode: ${err.message} (${err.name})`);
+                    }
+                }
+            }
+
+            // Listen for fullscreen changes (e.g., user pressing Esc)
+            document.addEventListener('fullscreenchange', () => {
+                state.isFullscreen = !!document.fullscreenElement;
+                elements.bodyElement.classList.toggle('fullscreen-active', state.isFullscreen);
+                elements.fullscreenBtnText.textContent = state.isFullscreen ? 'Exit' : 'Fullscreen';
+            });
+
+            function toggleTheme() {
+                state.isLightTheme = elements.themeToggle.checked;
+                elements.htmlElement.classList.toggle('light-theme', state.isLightTheme);
+            }
+
+            // --- Event Listeners ---
+            elements.formatBtn.addEventListener('click', toggleTimeFormat);
+            elements.fullscreenBtn.addEventListener('click', toggleFullscreen);
+            elements.themeToggle.addEventListener('change', toggleTheme);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ignore shortcuts if user is typing in an input field (if any added later)
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                const keyActionMap = {
+                    'f': toggleTimeFormat,
+                    's': toggleFullscreen,
+                    'escape': () => {
+                        if (state.isFullscreen) {
+                            toggleFullscreen();
+                        }
+                    }
+                };
+
+                const action = keyActionMap[e.key.toLowerCase()];
+                if (action) {
+                    e.preventDefault(); // Prevent default browser actions (like 'f' for find)
+                    action();
+                }
+            });
+
+            // --- Initialization ---
+            toggleTheme(); // Apply initial theme (based on checkbox default or saved state)
+            updateClock(); // Start the clock
+        });
+    </script>
+</body>
+</html>

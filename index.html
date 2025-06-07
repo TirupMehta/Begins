@@ -353,7 +353,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </footer>
 
-    <script src="https://insights.begins.site/track.js" data-site-id="site_e9637af65f452560ae14b748aaabf5d5"></script>
+    <script>
+(function() {
+  const sessionId = 'sess_' + Math.random().toString(36).substr(2, 9) + Date.now();
+  
+  function track(eventType, data = {}) {
+    fetch('https://insights.begins.site/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        siteId: 'main',
+        sessionId: sessionId,
+        eventType: eventType,
+        page: window.location.pathname,
+        referrer: document.referrer || '',
+        ...data
+      })
+    }).catch(console.error);
+  }
+  
+  // Track page view
+  track('pageview');
+  
+  // Track page visibility
+  document.addEventListener('visibilitychange', () => {
+    track(document.hidden ? 'page_hidden' : 'page_visible');
+  });
+  
+  // Track page unload
+  window.addEventListener('beforeunload', () => track('page_unload'));
+})();
+</script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

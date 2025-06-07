@@ -353,8 +353,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </footer>
 
-    <script>
-(function() {
+<script>
+// Begins Insights Tracking Script
+;(() => {
   const sessionId = 'sess_' + Math.random().toString(36).substr(2, 9) + Date.now();
   
   function track(eventType, data = {}) {
@@ -366,6 +367,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         sessionId: sessionId,
         eventType: eventType,
         page: window.location.pathname,
+        host: window.location.hostname,
         referrer: document.referrer || '',
         ...data
       })
@@ -382,6 +384,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
   // Track page unload
   window.addEventListener('beforeunload', () => track('page_unload'));
+  
+  // Send heartbeat every 15 seconds
+  setInterval(() => {
+    if (!document.hidden) track('heartbeat');
+  }, 15000);
 })();
 </script>
 
